@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/chat
+logging:
+  level:
+    org.springframework.data.mongodb.core: DEBUG
+
+
+
