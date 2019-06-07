@@ -1,5 +1,4 @@
 import util from '@/libs/util.js'
-import { addLocale } from 'core-js';
 
 export default {
   namespaced: true,
@@ -10,7 +9,8 @@ export default {
     ],
     CONTENTS: [
 
-    ]
+    ],
+    KEEPALIVE_SOCKET: null
   },
   mutations: {
     addContent(state, chatMsg) {
@@ -22,16 +22,18 @@ export default {
     init({ state, dispatch }, { receiver, websocket }) {
       return new Promise(async resolve => {
         var userId = util.cookies.get('objectid')
-
         // 创建管理对象 将来在关闭的时候是通过这个来的
-        var userSocket = {
-          socket: websocket,
-          userId: userId,
-          reveiverId: receiver.userId
+        if (receiver.userId === 'server') {
+          state.KEEPALIVE_SOCKET = websocket
+        } else {
+          var userSocket = {
+            socket: websocket,
+            userId: userId,
+            reveiverId: receiver.userId
+          }
+
+          state.SOCKET_STORE.push(userSocket)
         }
-
-        state.SOCKET_STORE.push(userSocket)
-
         resolve()
       })
     },
@@ -46,7 +48,7 @@ export default {
         resolve()
       })
     },
-    chatAt({ state, dispatch,commit }, { chatMsg, receiver }) {
+    chatAt({ state, dispatch, commit }, { chatMsg, receiver }) {
       commit('addContent', chatMsg)
     },
     onMessage({ state, dispatch, commit }, { chatMsg, receiver }) {

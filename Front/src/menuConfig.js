@@ -20,6 +20,11 @@ const asideMenuConfig = [
       // },
     ],
   },
+  {
+    name: '请求',
+    path: '/request',
+    icon: 'home',
+  },
 ]; // 顶栏菜单配置
 // ice 不会修改 headerMenuConfig
 // 如果你需要功能开发之前就配置出菜单原型，可以只设置 name 字段

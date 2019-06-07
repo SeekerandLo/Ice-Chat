@@ -1,5 +1,6 @@
 import setting from '@/setting.js'
 import { SearchFriend } from '@api/sys.search'
+import util from '@/libs/util.js'
 
 export default {
   namespaced: true,
@@ -59,8 +60,11 @@ export default {
       searchText = ''
     } = {}) {
       return new Promise((resolve, reject) => {
+        var me = util.cookies.get('objectid')
+
+
         SearchFriend({
-          searchText
+          searchText,me
         }).then(async res => {
           // TODO 加到计算属性中去
           console.log('找到的朋友 ↓')

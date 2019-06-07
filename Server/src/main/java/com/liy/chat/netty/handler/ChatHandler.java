@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.liy.chat.netty.pojo.ChannelMap;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.DataContent;
+import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
 import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
+import com.liy.chat.netty.pojo.RequestMsg;
 import com.liy.chat.service.FriendService;
 import com.liy.chat.service.MsgService;
 import com.liy.chat.utils.MsgUtils;
@@ -16,7 +18,11 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 处理消息的handler
@@ -24,11 +30,12 @@ import org.springframework.context.ApplicationContext;
  **/
 public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
+    private Logger logger = LoggerFactory.getLogger(Logger.class);
     // 管理所有客户端
-    private static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    // TODO 当一个连接断开的时候，应该将它们从map中移除
-    // TODO　代码抽离
+    // TODO 当一个连接断开的时候，是否应该将它们从map中移除，还是保留在Map中，如不移除再创建的时候是覆盖了
+    // TODO 代码抽离
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         String content = msg.text();
@@ -44,8 +51,13 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             String senderId = chatMsg.getSenderId();
             String receiverId = chatMsg.getReceiverId();
 
-            ChannelMap.put(senderId, receiverId, currentChannel);
-
+            // 判断chatMsg的 receiverId 是否是 server
+            if (chatMsg.getReceiverId().equals("server")) {
+                ChannelMap.put(ConnectionEnum.RECEIVE_REQUEST, senderId, receiverId, currentChannel);
+            } else {
+                ChannelMap.put(ConnectionEnum.CHAT, senderId, receiverId, currentChannel);
+            }
+            ChannelMap.out();
         } else if (action.equals(MsgTypeEnum.CHAT.type)) {
             ApplicationContext applicationContext = SpringUtils.getApplicationContext();
             MsgService msgService = (MsgService) applicationContext.getBean("msgService");
@@ -53,21 +65,23 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             String msgId = msgService.saveMsgRecord(dataContent.getChatMsg());
             chatMsg.setMsgId(msgId);
 
-            sendMsg(chatMsg);
-
-            // 将记录保存到数据库，然后转发
+            sendMsg(chatMsg, ConnectionEnum.CHAT);
         } else if (action.equals(MsgTypeEnum.FRIEND_REQUEST.type)) {
             ApplicationContext applicationContext = SpringUtils.getApplicationContext();
             FriendService friendService = (FriendService) applicationContext.getBean("friendService");
-            String msgId = friendService.sendFriendRequest(dataContent.getChatMsg());
+            String msgId = friendService.saveFriendRequest(dataContent.getChatMsg());
             chatMsg.setMsgId(msgId);
-            // 发给接收者
-            sendMsg(chatMsg);
+
+            // 首先保存到 数据库中，谁请求的 ，谁接收到的，然后通过 netty 转发，如果在线，通过接收请求的的 channel 发送给目标用户
+            sendMsg(chatMsg, ConnectionEnum.RECEIVE_REQUEST);
 
         } else if (action.equals(MsgTypeEnum.SIGNED.type)) {
             // 签收消息
         } else if (action.equals(MsgTypeEnum.KEEPALIVE.type)) {
             // 保持连接
+            logger.info("Bon Bon：" + ctx.channel().id().asShortText());
+
+
         }
 
 
@@ -85,8 +99,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         // 离开,当触发 移除时  会自动移除
         clients.remove(ctx.channel());
-        System.out.println("关闭" + ctx.channel().id().asLongText());
+        logger.info("关闭channel: " + ctx.channel().id().asLongText());
+        ChannelMap.out();
         super.handlerRemoved(ctx);
+    }
+
+    // TODO 当关闭连接时 移除 map中的
+    private void removeInvalidChannel(){
+
     }
 
     @Override
@@ -99,21 +119,75 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     }
 
 
-    private void sendMsg(ChatMsg chatMsg) {
-        Channel receiverChannel = ChannelMap.getChannel(chatMsg.getSenderId(), chatMsg.getReceiverId());
+    private void sendMsg(ChatMsg chatMsg, ConnectionEnum connectionEnum) {
+        Channel receiverChannel = null;
+        if (connectionEnum.equals(ConnectionEnum.CHAT)) {
+            receiverChannel = ChannelMap.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
+            // TODO 这里已经判断过是什么类型了，调用的方法再判断没有意义
+            sendChatMsg(receiverChannel, chatMsg);
+        } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
+            receiverChannel = ChannelMap.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
+            sendRequestMsg(receiverChannel, chatMsg);
+        }
+
+    }
+
+    private void sendMsg(Channel receiverChannel, ChatMsg chatMsg, ConnectionEnum connectionEnum) {
         if (receiverChannel == null) {
             // 用户离线，保存，
         } else {
             Channel findChannel = clients.find(receiverChannel.id());
             if (findChannel != null) {
                 // 用户在线,发送消息
-                System.out.println(JSONObject.toJSONString(chatMsg));
-                System.out.println(chatMsg.toString());
+                if (connectionEnum.equals(ConnectionEnum.CHAT)) {
+                    sendChatMsg(receiverChannel, chatMsg);
+                } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
+                    sendRequestMsg(receiverChannel, chatMsg);
+                }
 
+            } else {
+                // 用户离线，保存
+            }
+        }
+    }
+
+    private void sendChatMsg(Channel receiverChannel, ChatMsg chatMsg) {
+        if (receiverChannel == null) {
+            // 用户离线，保存，
+        } else {
+            Channel findChannel = clients.find(receiverChannel.id());
+            if (findChannel != null) {
+                // 用户在线,发送消息
                 receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(chatMsg)));
             } else {
                 // 用户离线，保存
             }
         }
+    }
+
+    private void sendRequestMsg(Channel receiverChannel, ChatMsg chatMsg) {
+        ApplicationContext applicationContext = SpringUtils.getApplicationContext();
+        MsgService msgService = (MsgService) applicationContext.getBean("msgService");
+
+        RequestMsg requestMsg = null;
+        // TODO 异常处理
+        try {
+            requestMsg = msgService.packageRequestMsg(chatMsg);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        if (receiverChannel == null) {
+            // 用户离线，保存，
+        } else {
+            Channel findChannel = clients.find(receiverChannel.id());
+            if (findChannel != null) {
+                // 用户在线,发送消息
+                receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(requestMsg)));
+            } else {
+                // 用户离线，保存
+            }
+        }
+
     }
 }

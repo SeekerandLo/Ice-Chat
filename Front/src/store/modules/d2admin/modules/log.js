@@ -11,22 +11,28 @@ export default {
     //   - type 非必须 类型 success | warning | info(默认) | danger
     //   - time 必须 日志记录时间
     //   - meta 非必须 其它携带信息
-    log: []
+    log: [],
+    requests: []
   },
   getters: {
     /**
      * @description 返回现存 log (all) 的条数
      * @param {*} state vuex state
      */
-    length (state) {
+    // TODO 修改为request的length
+    length(state) {
       return state.log.length
     },
     /**
      * @description 返回现存 log (error) 的条数
      * @param {*} state vuex state
      */
-    lengthError (state) {
+    lengthError(state) {
       return state.log.filter(log => log.type === 'danger').length
+    },
+    lengthRequest(state) {
+      // TODO filter 为未处理的
+      return state.requests.length
     }
   },
   actions: {
@@ -36,7 +42,7 @@ export default {
      * @param {String} param type {String} 类型
      * @param {Object} param meta {Object} 附带的信息
      */
-    push ({ rootState, commit }, { message, type = 'info', meta }) {
+    push({ rootState, commit }, { message, type = 'info', meta }) {
       commit('push', {
         message,
         type,
@@ -54,6 +60,18 @@ export default {
           ...meta
         }
       })
+    },
+    addFriendRequest({ state, commit }, { request }) {
+      console.log(request)
+      commit("receiverRequest", request)
+    },
+    // TODO 同意好友请求，发送请求，将请求改为已读
+    agree({ state, commit }, { }) {
+
+    },
+    // TODO 拒绝好友请求
+    refuse({ state, commit }, { }) {
+
     }
   },
   mutations: {
@@ -62,16 +80,20 @@ export default {
      * @param {Object} state vuex state
      * @param {Object} log data
      */
-    push (state, log) {
+    push(state, log) {
       state.log.push(log)
     },
     /**
      * @description 清空日志
      * @param {Object} state vuex state
      */
-    clean (state) {
+    clean(state) {
       // store 赋值
       state.log = []
+    },
+    receiverRequest(state, request) {
+      console.log(request)
+      state.requests.push(request)
     }
   }
 }

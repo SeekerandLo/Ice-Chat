@@ -6,6 +6,7 @@ import com.liy.chat.vo.UserVO;
 import com.liy.chat.entity.User;
 import com.liy.chat.exception.NoUserException;
 import com.liy.chat.exception.PasswordError;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -65,6 +66,11 @@ public class AccountService {
         UserVO userVO = new UserVO();
         userVO.setUsername(accountDTO.getUsername());
         return userVO;
+    }
+
+    public String getUsername(String objectId) {
+        User user = Optional.ofNullable(mongoTemplate.findById(new ObjectId(objectId), User.class)).orElseThrow(NoUserException::new);
+        return user.getUsername();
     }
 
 

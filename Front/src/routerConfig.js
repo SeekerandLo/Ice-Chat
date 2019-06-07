@@ -5,9 +5,9 @@ import util from '@/libs/util.ice'; // 页面和布局
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Error404 from './pages/Error404';
-import Demo2 from './pages/Chat';
+import Chat from './pages/Chat';
 import Register from './pages/Register';
-
+import Request from './pages/Request';
 import HeaderAside from './layouts/HeaderAside'; // 变量名 routerConfig 为 iceworks 检测关键字
 // ice 会自动在这个变量下添加路由数据
 // 请不要修改名称
@@ -64,8 +64,13 @@ const routerConfig = [
   {
     path: '/chat',
     layout: HeaderAside,
-    component: Demo2,
-  }
+    component: Chat,
+  },
+  {
+    path: '/request',
+    layout: HeaderAside,
+    component: Request,
+  },
 ]; // 不参与菜单显示的
 // ice 不会处理这部分
 // 但是这部分路由也会被注册
@@ -80,7 +85,6 @@ const routerConfigMenuOut = [
     meta: {
       auth: false,
     },
-    
   }, // 404
   {
     path: '*',

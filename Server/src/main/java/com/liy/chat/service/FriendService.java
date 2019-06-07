@@ -32,11 +32,11 @@ public class FriendService {
     @Autowired
     AccountService accountService;
 
-    public List<UserVO> searchFriend(String username) {
+    public List<UserVO> searchFriend(String username, String me) {
 
         Query query = new Query();
         Pattern pattern = Pattern.compile("^.*" + username + ".*$", Pattern.CASE_INSENSITIVE);
-        query.addCriteria(Criteria.where("username").regex(pattern));
+        query.addCriteria(Criteria.where("username").regex(pattern).and("_id").ne(me));
         List<User> users = mongoTemplate.find(query, User.class);
 
         List<UserVO> userVOS = new ArrayList<>();
@@ -48,7 +48,7 @@ public class FriendService {
     }
 
     //TODO 添加好友  ，同意得话 删除以前得请求，在两个人得好友中添加上对方
-    public String sendFriendRequest(ChatMsg chatMsg) {
+    public String saveFriendRequest(ChatMsg chatMsg) {
         // String senderId, String receiverId, String reason
         RequestMessage requestMessage = new RequestMessage();
 
