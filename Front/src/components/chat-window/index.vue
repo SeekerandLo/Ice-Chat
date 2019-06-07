@@ -5,9 +5,11 @@
 				<img src="../../../public/image/avatar/avatar.jpeg" class="img_avatar">
 				<span class="chat_header_name">{{receiver.username}}</span>
 			</div>
+			<!-- TODO 为何在渲染页面时 在计算属性中不行呢？ -->
+			<!-- VUE 不能检测 对象属性的增加和删除 -->
 		</template>
 		<div class="chat_content">
-			<div v-for="(mes,index) in getTargetMsg" :key="index">
+			<div v-for="(mes,index) in getTargetMsgSS" :key="index">
 				<div :class="[mes.receiverId === info.id ? receive_Class : send_Class ]" style>{{mes.msg}}</div>
 			</div>
 		</div>
@@ -53,7 +55,8 @@ export default {
 			CHAT_TYPE: {}
 		};
 	},
-	props: ["receiver", "TEMP_CONNENTS"],
+	props: ["receiver"],
+
 	created() {
 		this.CHAT_TYPE = CHAT_TYPE();
 		if (
@@ -61,12 +64,18 @@ export default {
 			this.webSocket !== undefined &&
 			this.webSocket.readyState === WebSocket.OPEN
 		) {
-			console.log("连接已建立");
 		} else {
-			// TODO 进入然后调用 new WebSocket
 			this.initWebSocket();
 		}
+		// }
 	},
+	// watch: {
+	// 	$route(to, from) {
+	// 		console.log(this.CONTENTS);
+	// 		this.MessageContent = this.getTargetMsg(this.CONTENTS);
+	// 		// 每当路由变化，
+	// 	}
+	// },
 	updated() {
 		// 更新滚动跳
 		this.$nextTick(() => {
@@ -78,15 +87,29 @@ export default {
 	},
 	computed: {
 		...mapState("d2admin/user", ["info"]),
-		// TODO 过滤 和当前 reveiverId 的记录
-		getTargetMsg() {
-			var targetMsg = [];
-			targetMsg = this.TEMP_CONNENTS[this.receiver.userId];
-			return targetMsg;
+		...mapState("d2admin/socket", ["CONTENTS"]),
+		// TODO 现在的问题是，虽然我把它放在了计算属性中，但是却没有 更新它，所以不会变化，
+		// this.MessageContent = this.getTargetMsg()
+		getTargetMsgSS() {
+			console.log(this.CONTENTS);
+			var a = this.CONTENTS.filter(element => {
+				console.log(element);
+
+				if (
+				element.receiverId === this.info.id &&	element.senderId === this.receiver.userId 
+					
+				) {
+					return element;
+				} else if (element.receiverId === this.receiver.userId) {
+					return element;
+				}
+			});
+			console.log(a);
+			return a;
 		}
 	},
 	methods: {
-		...mapActions("d2admin/socket", ["init", "chatAt","onMessage"]),
+		...mapActions("d2admin/socket", ["init", "chatAt", "onMessage"]),
 		// websocket初始化
 		initWebSocket() {
 			const uri = process.env.VUE_APP_WEBSOCKETURI;
@@ -122,16 +145,18 @@ export default {
 		// websocket接收消息
 		webSocketOnMessage(receivedMessage) {
 			var receivedMessageContent = JSON.parse(receivedMessage.data);
-      
-      this.onMessage({
-        chatMsg: chatMsg,
+
+			// console.log(receivedMessageContent);
+
+			this.MessageContent.push(receivedMessageContent);
+			this.onMessage({
+				chatMsg: JSON.parse(receivedMessage.data),
 				receiver: this.receiver
-      })
-      
-      // this.MessageContent.push(receivedMessageContent);
+			});
 		},
 		// websocket发送消息
 		webSocketSend(dataContent) {
+			// console.log(dataContent);
 			this.webSocket.send(dataContent);
 		},
 		// websocket关闭
@@ -151,8 +176,10 @@ export default {
 			);
 			this.message = "";
 
+			this.MessageContent.push(chatMsg);
+
 			// 前端
-			// this.MessageContent.push(chatMsg);
+
 			this.chatAt({
 				chatMsg: chatMsg,
 				receiver: this.receiver
@@ -181,6 +208,23 @@ export default {
 			};
 
 			return dataContent;
+		},
+
+		getTargetMsg(CONTENTS) {
+			var a = [];
+			console.log("调用");
+			return CONTENTS.filter(element => {
+				if (element.receiverId === this.receiver.userId) {
+					a.push(element);
+				}
+				if (
+					element.sendId === this.receiver.userId &&
+					element.receiverId === this.info.id
+				) {
+					a.push(element);
+				}
+				return a;
+			});
 		}
 	}
 };

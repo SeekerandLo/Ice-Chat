@@ -8,8 +8,13 @@ export default {
     SOCKET_STORE: [
 
     ],
-    CONTENTS: {
+    CONTENTS: [
 
+    ]
+  },
+  mutations: {
+    addContent(state, chatMsg) {
+      state.CONTENTS.push(chatMsg)
     }
   },
   actions: {
@@ -41,33 +46,11 @@ export default {
         resolve()
       })
     },
-    chatAt({ state, dispatch }, { chatMsg, receiver }) {
-      // console.log(chatMsg)
-      // console.log(receiver)
-
-      // 判断与该用户的聊天记录 是否存在
-      // console.log(Object.keys(state.CONTENTS))
-      // 如果包含
-      if (Object.keys(state.CONTENTS).indexOf(receiver.userId) > -1) {
-        var receiverId = receiver.userId
-        state.CONTENTS[receiverId].push(chatMsg)
-      } else {
-        var content = []
-        content.push(chatMsg)
-
-        state.CONTENTS[receiver.userId] = content
-      }
-      console.log(state.CONTENTS)
+    chatAt({ state, dispatch,commit }, { chatMsg, receiver }) {
+      commit('addContent', chatMsg)
     },
-    onMessage({ state, dispatch }, { chatMsg, receiver }) {
-      if (Object.keys(state.CONTENTS).indexOf(receiver.userId) > -1) {
-        var receiverId = receiver.userId
-        state.CONTENTS[receiverId].push(chatMsg)
-      } else {
-        var content = []
-        content.push(chatMsg)
-        state.CONTENTS[receiver.userId] = content
-      }
+    onMessage({ state, dispatch, commit }, { chatMsg, receiver }) {
+      commit('addContent', chatMsg)
     }
   }
 }
