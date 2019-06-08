@@ -11,6 +11,8 @@ process.env.VUE_APP_BUILD_TIME = require('dayjs')().format('YYYY-M-D HH:mm:ss')
 
 // 基础路径 注意发布之前要先修改这里
 let publicPath = './'
+// let publicPath = '/'
+
 
 module.exports = {
   publicPath, // 根据你的实际情况更改这里
@@ -98,5 +100,17 @@ module.exports = {
     // 重新设置 alias
     config.resolve.alias
       .set('@api', resolve('src/api'))
-  }
+  },
+  // devServer: {
+  //   proxy: {
+  //     '/api': {
+  //       target: 'http://101.132.147.55:8080/api',
+  //       ws: true,
+  //       changeOrigin: true,
+  //       pathRewrite: {
+  //         '^/api': ''
+  //       }
+  //     }
+  //   }
+  // }
 }

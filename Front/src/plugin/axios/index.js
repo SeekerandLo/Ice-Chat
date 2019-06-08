@@ -35,6 +35,8 @@ function errorLog (error) {
 
 // BaseURL 在哪里修改啊
 var BASE_URL = 'http://101.132.147.55:8080/api/'
+// var BASE_URL = 'http://localhost:8080/api/'
+
 // const BASE_URL = process.env.VUE_APP_API
 // 创建一个 axios 实例
 const service = axios.create({

@@ -98,6 +98,9 @@ const routerConfigMenuOut = [
     path: '/register',
     name: 'register',
     component: Register,
+    meta: {
+      auth: false,
+    },
   },
 ]; // 导出全部路由设置
 // 这个数据会在 router.js 中被扁平处理
