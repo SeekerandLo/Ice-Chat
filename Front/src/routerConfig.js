@@ -70,6 +70,10 @@ const routerConfig = [
     path: '/request',
     layout: HeaderAside,
     component: Request,
+    meta: {
+      auth: true,
+      title: '好友请求',
+    }
   },
 ]; // 不参与菜单显示的
 // ice 不会处理这部分

@@ -1,28 +1,44 @@
 <template>
 	<div class="tag-message-list">
-		<basic-container>
-			<el-tabs v-model="activeTab" @tab-click="handleClick">
-				<el-tab-pane label="我的消息" name="message">
-					<div class="message-item" v-for="message in requests" :key="message.title">
-						<!-- TODO 切块  -->
-						<div class="d2-text-center">{{message.dateTime}}</div>
-						<!-- 好友请求，谁请求的，理由是啥 -->
-						<a href="##" class="title .d2-text-center">{{message.senderName}}</a>
-						<div class=".d2-text-center">{{ message.msg }}</div>
-						<!-- 下为时间 -->
-						<!-- 按钮 -->
-						<div>
+		<div v-if="requests.length > 0">
+			<div
+				v-for="(message,index) in requests"
+				:key="index"
+				style="margin-bottom:10px;"
+				class="d2-panel-search-item el-card"
+				:class="hoverMode ? 'can-hover' : ''"
+				flex
+			>
+				<div class="d2-panel-search-item__info" flex-box="1" flex="dir:top">
+					<div class="d2-panel-search-item__info-title" flex-box="1" flex="cross:center">
+						<div class="request-tag">
+							时间
+							: {{message.dateTime}}
+						</div>
+						<div class="request-tag">
+							用户名:
+							{{message.senderName}}
+						</div>
+						<div class="request-tag">
+							验证信息:
+							{{ message.msg }}
+						</div>
+						<div class="request-button">
 							<el-button type="primary" size="small" @click="handleAgree(message)">同意</el-button>
 							<el-button type="default" size="small" @click="handleRefuse(message)">拒绝</el-button>
 						</div>
 					</div>
-					<el-button type="text" class="show-more">查看全部消息</el-button>
-				</el-tab-pane>
-				<!-- <el-tab-pane label="待我处理" name="todo">
+				</div>
+			</div>
+
+			<el-button type="text" class="show-more">查看全部消息</el-button>
+			<!-- <el-tab-pane label="待我处理" name="todo">
           <p class="placeholder"> 暂无数据 </p>
-				</el-tab-pane>-->
-			</el-tabs>
-		</basic-container>
+			</el-tab-pane>-->
+		</div>
+		<div v-else>
+			<h1 class="index-noFriend">没有请求...</h1>
+		</div>
 	</div>
 </template>
 
@@ -36,14 +52,14 @@ export default {
 	name: "TagMessageList",
 	data() {
 		return {
-      activeTab: "message",
-      messageList:[]
+			activeTab: "message",
+			messageList: [],
+			hoverMode: {
+				default: false
+			}
 		};
 	},
-	created() {
-    // 进入这个页面 去后台请求未处理的数据
-    this.messageList = this.getUntreatedRequest()
-	},
+	created() {},
 	computed: {
 		...mapState("d2admin/log", ["requests"])
 	},
@@ -75,6 +91,19 @@ export default {
 </script>
 <style scoped lang="scss">
 @import "~normalize.css/normalize.css";
+
+.index-noFriend {
+	color: rgb(139, 139, 139);
+}
+
+.request-button {
+	margin-left: 20px;
+}
+
+.request-tag {
+	margin-right: 20px;
+}
+
 .tag-message-list {
 	.el-tabs__content {
 		color: #666;
@@ -99,6 +128,72 @@ export default {
 		display: block;
 		margin: 20px auto 0;
 		padding: 0;
+	}
+}
+.d2-panel-search-item {
+	height: 64px;
+	margin: 0px -20px;
+	&.can-hover {
+		@extend %unable-select;
+		margin: 0px;
+		&:hover {
+			background-color: #f5f7fa;
+			.d2-panel-search-item__icon {
+				.d2-panel-search-item__icon-box {
+					i {
+						font-size: 24px;
+						color: $color-primary;
+					}
+				}
+			}
+			.d2-panel-search-item__info {
+				.d2-panel-search-item__info-title {
+					color: $color-text-main;
+				}
+				.d2-panel-search-item__info-fullTitle {
+					color: $color-text-normal;
+				}
+				.d2-panel-search-item__info-path {
+					color: $color-text-normal;
+				}
+			}
+		}
+	}
+	.d2-panel-search-item__icon {
+		width: 64px;
+		.d2-panel-search-item__icon-box {
+			height: 64px;
+			width: 64px;
+			border-right: 1px solid $color-border-3;
+			i {
+				font-size: 20px;
+				color: $color-text-sub;
+			}
+			svg {
+				height: 20px;
+				width: 20px;
+			}
+		}
+	}
+	.d2-panel-search-item__info {
+		margin-left: 10px;
+		.d2-panel-search-item__info-title {
+			font-size: 16px;
+			line-height: 16px;
+			font-weight: bold;
+			color: $color-text-normal;
+		}
+		.d2-panel-search-item__info-fullTitle {
+			font-size: 10px;
+			line-height: 14px;
+			color: $color-text-placehoder;
+		}
+		.d2-panel-search-item__info-path {
+			margin-bottom: 4px;
+			font-size: 10px;
+			line-height: 14px;
+			color: $color-text-placehoder;
+		}
 	}
 }
 </style>

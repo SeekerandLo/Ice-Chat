@@ -7,7 +7,7 @@ import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
 import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
 import com.liy.chat.netty.pojo.MsgEnum.RequestActionEnum;
-import com.liy.chat.netty.pojo.RequestMsg;
+import com.liy.chat.vo.FriendRequestVO;
 import com.liy.chat.vo.RequestResponseVO;
 import com.liy.chat.vo.UserVO;
 import org.bson.types.ObjectId;
@@ -19,7 +19,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -178,14 +181,15 @@ public class FriendService {
     }
 
 
-    public List<RequestMsg> getUntreatedFriendRequest(String userId) {
+    // 每次登录获取未处理的好友请求
+    public List<FriendRequestVO> getUntreatedFriendRequest(String userId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("receiverId").is(userId).and("action").is(MsgTypeEnum.FRIEND_REQUEST).and("msgHandle").is(MsgHandleEnum.UNTREATED));
 
         List<RequestMessage> requestMessages = mongoTemplate.find(query, RequestMessage.class);
-        List<RequestMsg> requestMsgs = new ArrayList<>();
+        List<FriendRequestVO> requestMsgs = new ArrayList<>();
         requestMessages.forEach(requestMessage -> {
-            requestMsgs.add(msgService.packageRequestMsg(requestMessage));
+            requestMsgs.add(msgService.packageFriendRequestVO(requestMessage));
         });
 
         return requestMsgs;

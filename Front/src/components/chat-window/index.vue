@@ -17,8 +17,14 @@
 				<div>
 					<el-upload
 						class="upload-demo"
+            action="https://jsonplaceholder.typicode.com/posts/"
+						:on-preview="handlePreview"
+						:on-remove="handleRemove"
+						:before-remove="beforeRemove"
+						:on-exceed="handleExceed"
+						:file-list="fileList"
 					>
-						<el-button size="small" type="primary">点击上传</el-button>
+						<el-button size="small" type="primary">点击发送</el-button>
 					</el-upload>
 				</div>
 			</div>
@@ -42,7 +48,8 @@ export default {
 			receive_Class: "receive_mes",
 			CHAT_TYPE: {},
 			default_class: "el-button--default",
-			primary_class: "el-button--primary"
+			primary_class: "el-button--primary",
+			fileList: []
 		};
 	},
 	created() {
@@ -172,6 +179,25 @@ export default {
 			};
 
 			return dataContent;
+		},
+
+		// -----------处理上传的钩子
+
+		handleRemove(file, fileList) {
+			console.log(file, fileList);
+		},
+		handlePreview(file) {
+			console.log(file);
+		},
+		handleExceed(files, fileList) {
+			this.$message.warning(
+				`当前限制选择 3 个文件，本次选择了 ${
+					files.length
+				} 个文件，共选择了 ${files.length + fileList.length} 个文件`
+			);
+		},
+		beforeRemove(file, fileList) {
+			return this.$confirm(`确定移除 ${file.name}？`);
 		}
 	}
 };
@@ -198,8 +224,7 @@ export default {
 }
 .chat_footer_fun {
 	width: 100%;
-	border: 1px solid #f1f1f1;
-	margin-bottom: 20px;
+	margin-bottom: 50px;
 	height: 30px;
 }
 

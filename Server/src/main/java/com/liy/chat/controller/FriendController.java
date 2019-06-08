@@ -1,8 +1,7 @@
 package com.liy.chat.controller;
 
-import com.liy.chat.entity.RequestMessage;
-import com.liy.chat.netty.pojo.RequestMsg;
 import com.liy.chat.service.FriendService;
+import com.liy.chat.vo.FriendRequestVO;
 import com.liy.chat.vo.RequestResponseVO;
 import com.liy.chat.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +50,7 @@ public class FriendController {
 
     @GetMapping("/untreated")
     public ResponseEntity<?> getUntreatedRequest(@RequestParam String userId) {
-        List<RequestMsg> requestMessages = friendService.getUntreatedFriendRequest(userId);
+        List<FriendRequestVO> requestMessages = friendService.getUntreatedFriendRequest(userId);
         return ResponseEntity.ok(requestMessages);
     }
 

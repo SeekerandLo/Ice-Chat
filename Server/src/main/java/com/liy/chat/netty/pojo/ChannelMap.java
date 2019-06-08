@@ -2,25 +2,20 @@ package com.liy.chat.netty.pojo;
 
 import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * data: 2019/6/5 17:24
- * 存放 Channel 与 用户Id的关系
- * <p>
- * <p>
- * 前端问题，在点击用户 进行聊天时，虽然打开了两个窗口，但是她们的socket出现了问题，当切换窗口后 socket 就断了。再切换回去会重新连接
- * 已解决：使用 watch 监听 路由变化
- * <p>
+ * 存放Channel与用户Id的关系
+ * 目前有两类
+ * 接收请求：Key: RECEIVE_REQUEST-5cf7e04eaeb1fc2018c78d21-server
+ * 聊天： Key: CHAT-5cf7e04eaeb1fc2018c78d21-5cf6871d12941a25508f4392
  **/
 
 public class ChannelMap {
 
-    private Logger logger = LoggerFactory.getLogger(Logger.class);
 
     private static HashMap<String, Channel> channelMap = new HashMap<>();
 

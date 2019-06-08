@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
+ * 聊天消息内容
  * data: 2019/6/5 15:45
  **/
 @Data

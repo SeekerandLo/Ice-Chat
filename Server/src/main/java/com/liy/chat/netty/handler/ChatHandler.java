@@ -6,11 +6,11 @@ import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.DataContent;
 import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
 import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
-import com.liy.chat.netty.pojo.RequestMsg;
 import com.liy.chat.service.FriendService;
 import com.liy.chat.service.MsgService;
 import com.liy.chat.utils.MsgUtils;
 import com.liy.chat.utils.SpringUtils;
+import com.liy.chat.vo.FriendRequestVO;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -21,8 +21,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * 处理消息的handler
@@ -105,7 +103,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     }
 
     // TODO 当关闭连接时 移除 map中的
-    private void removeInvalidChannel(){
+    private void removeInvalidChannel() {
 
     }
 
@@ -126,30 +124,13 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             sendChatMsg(receiverChannel, chatMsg);
         } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
             receiverChannel = ChannelMap.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
-            sendRequestMsg(receiverChannel, chatMsg);
+            sendFriendRequestMsg(receiverChannel, chatMsg);
         }
 
     }
 
-    private void sendMsg(Channel receiverChannel, ChatMsg chatMsg, ConnectionEnum connectionEnum) {
-        if (receiverChannel == null) {
-            // 用户离线，保存，
-        } else {
-            Channel findChannel = clients.find(receiverChannel.id());
-            if (findChannel != null) {
-                // 用户在线,发送消息
-                if (connectionEnum.equals(ConnectionEnum.CHAT)) {
-                    sendChatMsg(receiverChannel, chatMsg);
-                } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
-                    sendRequestMsg(receiverChannel, chatMsg);
-                }
 
-            } else {
-                // 用户离线，保存
-            }
-        }
-    }
-
+    // 发送聊天消息
     private void sendChatMsg(Channel receiverChannel, ChatMsg chatMsg) {
         if (receiverChannel == null) {
             // 用户离线，保存，
@@ -164,25 +145,19 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         }
     }
 
-    private void sendRequestMsg(Channel receiverChannel, ChatMsg chatMsg) {
+    // 发送好友请求
+    private void sendFriendRequestMsg(Channel receiverChannel, ChatMsg chatMsg) {
         ApplicationContext applicationContext = SpringUtils.getApplicationContext();
         MsgService msgService = (MsgService) applicationContext.getBean("msgService");
 
-        RequestMsg requestMsg = null;
-        // TODO 异常处理
-        try {
-            requestMsg = msgService.packageRequestMsg(chatMsg);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        FriendRequestVO friendRequestVO = msgService.packageFriendRequestVO(chatMsg);
         if (receiverChannel == null) {
             // 用户离线，保存，
         } else {
             Channel findChannel = clients.find(receiverChannel.id());
             if (findChannel != null) {
                 // 用户在线,发送消息
-                receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(requestMsg)));
+                receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(friendRequestVO)));
             } else {
                 // 用户离线，保存
             }
