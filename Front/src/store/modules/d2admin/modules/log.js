@@ -1,9 +1,7 @@
 import dayjs from 'dayjs'
 import { get } from 'lodash'
 import util from '@/libs/util.js'
-import { Agree, Refuse, GetUntreatedRequest } from '@api/sys.friend'
-import { Message } from 'element-ui'
-
+import { Agree, GetUntreatedRequest } from '@api/sys.friend'
 
 export default {
   namespaced: true,
@@ -23,17 +21,17 @@ export default {
      * @param {*} state vuex state
      */
     // TODO 修改为request的length
-    length(state) {
+    length (state) {
       return state.log.length
     },
     /**
      * @description 返回现存 log (error) 的条数
      * @param {*} state vuex state
      */
-    lengthError(state) {
+    lengthError (state) {
       return state.log.filter(log => log.type === 'danger').length
     },
-    lengthRequest(state) {
+    lengthRequest (state) {
       // TODO filter 为未处理的
       return state.requests.length
     }
@@ -45,7 +43,7 @@ export default {
      * @param {String} param type {String} 类型
      * @param {Object} param meta {Object} 附带的信息
      */
-    push({ rootState, commit }, { message, type = 'info', meta }) {
+    push ({ rootState, commit }, { message, type = 'info', meta }) {
       commit('push', {
         message,
         type,
@@ -64,24 +62,20 @@ export default {
         }
       })
     },
-    addFriendRequest({ state, commit }, { request }) {
+    addFriendRequest ({ state, commit }, { request }) {
       console.log(request)
       commit('receiverRequest', request)
     },
     // TODO 同意好友请求，发送请求，将请求改为已读
-    agree({ state, commit }, { senderId, receiverId }) {
+    agree ({ state, commit }, { senderId, receiverId }) {
       return new Promise((resolve, reject) => {
         Agree({
           senderId,
           receiverId
         }).then(async res => {
-          // TODO 加到计算属性中去
-          console.log(res)
-          // TODO　移除消息  
           state.requests.map((item, index) => {
             if (item.msgId === res.msgId) {
               state.requests.splice(index, 1)
-
             }
           })
 
@@ -91,28 +85,21 @@ export default {
           reject(err)
         })
       })
-
     },
     // TODO 拒绝好友请求
-    refuse({ state, commit }, { senderId, receiverId }) {
+    refuse ({ state, commit }, { senderId, receiverId }) {
 
     },
-    getUntreatedRequest({ state, commit }) {
+    getUntreatedRequest ({ state, commit }) {
       return new Promise((resolve, reject) => {
         const userId = util.cookies.get('objectid')
-        console.log(userId)
-        GetUntreatedRequest({
-          userId
-        }).then((res) =>{
-          console.log(res)
+        GetUntreatedRequest({ userId }).then(async res => {
           state.requests = res
-
-
+          resolve()
+        }).catch(err => {
+          console.log('err: ', err)
+          reject(err)
         })
-        resolve()
-      }).catch(err => {
-        console.log('err: ', err)
-        reject(err)
       })
     }
   },
@@ -122,18 +109,18 @@ export default {
      * @param {Object} state vuex state
      * @param {Object} log data
      */
-    push(state, log) {
+    push (state, log) {
       state.log.push(log)
     },
     /**
      * @description 清空日志
      * @param {Object} state vuex state
      */
-    clean(state) {
+    clean (state) {
       // store 赋值
       state.log = []
     },
-    receiverRequest(state, request) {
+    receiverRequest (state, request) {
       console.log(request)
       state.requests.push(request)
     }

@@ -9,8 +9,7 @@
 
 // 组件
 import TagMessageList from './components/TagMessageList/index'
-import { mapState, mapActions } from "vuex";
-
+import { mapActions } from 'vuex'
 
 // 请删除下面代码中你不需要的部分
 export default {
@@ -18,13 +17,12 @@ export default {
   components: {
     TagMessageList
   },
-  created() {
-    // 进入这个页面 去后台请求未处理的数据
-	},
+  created () {
+  },
   // 数据
   data () {
     return {
-      messageList:[]
+      messageList: []
     }
   },
   // 计算属性
@@ -33,7 +31,6 @@ export default {
   watch: {},
   // 生命周期钩子
   beforeCreate () {},
-  created () {},
   beforeMount () {},
   mounted () {},
   beforeUpdate () {},
@@ -44,7 +41,7 @@ export default {
   destroyed () {},
   // 事件处理方法
   methods: {
-		...mapActions("d2admin/log", ["getUntreatedRequest"]),
+    ...mapActions('d2admin/log', ['getUntreatedRequest'])
   }
 }
 </script>

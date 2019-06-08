@@ -143,6 +143,9 @@ public class FriendService {
         query.addCriteria(Criteria.where("userId").is(userId));
 
         UserFriend userFriend = mongoTemplate.findOne(query, UserFriend.class);
+        if (userFriend == null) {
+            return null;
+        }
         return userFriend.getFriends();
 
     }

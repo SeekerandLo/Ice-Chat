@@ -4,6 +4,10 @@ plugins {
 }
 
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+apply plugin: 'idea'
+apply plugin: 'java'
 
 group = 'com.liy'
 version = '0.0.1-SNAPSHOT'

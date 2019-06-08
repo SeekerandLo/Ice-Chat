@@ -1,4 +1,4 @@
-export function CHAT_TYPE() {
+export function CHAT_TYPE () {
   var CHAT_TYPE = {
     CONNECT: 1,
     CHAT: 2,
@@ -9,7 +9,7 @@ export function CHAT_TYPE() {
   return CHAT_TYPE
 }
 
-export function REQUEST_ACTION() {
+export function REQUEST_ACTION () {
   var REQUEST_ACTION = {
     AGREE: 1,
     REFUSE: 2,
