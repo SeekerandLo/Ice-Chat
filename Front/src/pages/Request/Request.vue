@@ -1,25 +1,31 @@
 <template>
   <!-- d2-container 文档 https://doc.d2admin.fairyever.com/zh/sys-components/container.html -->
   <d2-container class="page-request">
-    <template slot="header">请求列表</template>
-    <tag-message-list/>
+    <tag-message-list :messageList="messageList"/>
   </d2-container>
 </template>
 
 <script>
 
-
 // 组件
 import TagMessageList from './components/TagMessageList/index'
+import { mapState, mapActions } from "vuex";
+
+
 // 请删除下面代码中你不需要的部分
 export default {
   name: 'request',
   components: {
     TagMessageList
   },
+  created() {
+    // 进入这个页面 去后台请求未处理的数据
+	},
   // 数据
   data () {
-    return {}
+    return {
+      messageList:[]
+    }
   },
   // 计算属性
   computed: {},
@@ -37,7 +43,9 @@ export default {
   beforeDestroy () {},
   destroyed () {},
   // 事件处理方法
-  methods: {}
+  methods: {
+		...mapActions("d2admin/log", ["getUntreatedRequest"]),
+  }
 }
 </script>
 

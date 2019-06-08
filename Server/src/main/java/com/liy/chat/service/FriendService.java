@@ -6,18 +6,22 @@ import com.liy.chat.entity.UserFriend;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
 import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
+import com.liy.chat.netty.pojo.MsgEnum.RequestActionEnum;
+import com.liy.chat.netty.pojo.RequestMsg;
+import com.liy.chat.vo.RequestResponseVO;
 import com.liy.chat.vo.UserVO;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * data: 2019/6/5 10:28
@@ -32,11 +36,21 @@ public class FriendService {
     @Autowired
     AccountService accountService;
 
+
+    @Autowired
+    MsgService msgService;
+
     public List<UserVO> searchFriend(String username, String me) {
+        Query myQuery = new Query().addCriteria(Criteria.where("userId").is(me));
+        UserFriend currentUser = mongoTemplate.findOne(myQuery, UserFriend.class);
+        List<UserVO> friends = currentUser.getFriends();
+        // 把好友转换为map，但是不包含自己
+        Map<String, String> userFriendMap = friends.stream().collect(Collectors.toMap(UserVO::getUserId, UserVO::getUsername));
+        userFriendMap.put(me, null);
 
         Query query = new Query();
         Pattern pattern = Pattern.compile("^.*" + username + ".*$", Pattern.CASE_INSENSITIVE);
-        query.addCriteria(Criteria.where("username").regex(pattern).and("_id").ne(me));
+        query.addCriteria(Criteria.where("username").regex(pattern).and("_id").nin(userFriendMap.keySet()));
         List<User> users = mongoTemplate.find(query, User.class);
 
         List<UserVO> userVOS = new ArrayList<>();
@@ -47,16 +61,75 @@ public class FriendService {
         return userVOS;
     }
 
+
+    public RequestResponseVO processRequest(String senderId, String receiverId, Integer action) {
+        if (action.equals(RequestActionEnum.AGREE.type)) {
+            // 同意->把请求状态改为已处理，且相互添加好友
+            // TODO 考虑两个用户重复的发请求
+            String msgId = changeState(senderId, receiverId);
+            mutualAddFriend(senderId, receiverId);
+
+            RequestResponseVO responseVO = new RequestResponseVO();
+            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
+            responseVO.setRequestActionEnum(RequestActionEnum.AGREE);
+            responseVO.setMsgId(msgId);
+
+            return responseVO;
+
+        } else if (action.equals(RequestActionEnum.REFUSE.type)) {
+            // 拒绝
+            String msgId = changeState(senderId, receiverId);
+
+
+            RequestResponseVO responseVO = new RequestResponseVO();
+            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
+            responseVO.setRequestActionEnum(RequestActionEnum.REFUSE);
+            responseVO.setMsgId(msgId);
+
+            return responseVO;
+
+        } else if (action.equals(RequestActionEnum.IGNORE.type)) {
+            // 忽略
+            String msgId = changeState(senderId, receiverId);
+
+
+            RequestResponseVO responseVO = new RequestResponseVO();
+            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
+            responseVO.setRequestActionEnum(RequestActionEnum.IGNORE);
+            responseVO.setMsgId(msgId);
+
+            return responseVO;
+
+        }
+        return null;
+
+    }
+
+    // 修改状态
+    public String changeState(String senderId, String receiverId) {
+        Query query = new Query().addCriteria(Criteria.where("senderId").is(senderId).and("receiverId").is(receiverId));
+        query.with(new Sort(Sort.Direction.DESC, "sendTime"));
+        query.limit(1);
+
+        RequestMessage requestMessage = mongoTemplate.findOne(query, RequestMessage.class);
+
+        Update update = Update.update("msgHandle", MsgHandleEnum.PROCESSED);
+        mongoTemplate.findAndModify(query, update, RequestMessage.class);
+        return requestMessage.getId().toHexString();
+    }
+
+
     //TODO 添加好友  ，同意得话 删除以前得请求，在两个人得好友中添加上对方
     public String saveFriendRequest(ChatMsg chatMsg) {
-        // String senderId, String receiverId, String reason
+        // String senderId, String receiverId, String msg
         RequestMessage requestMessage = new RequestMessage();
 
         requestMessage.setAction(MsgTypeEnum.FRIEND_REQUEST);
-        requestMessage.setReason(chatMsg.getMsg());
+        requestMessage.setMsg(chatMsg.getMsg());
         requestMessage.setSenderId(chatMsg.getSenderId());
         requestMessage.setReceiverId(chatMsg.getReceiverId());
         requestMessage.setMsgHandle(MsgHandleEnum.UNTREATED);
+        requestMessage.setSendTime(new Date());
 
         mongoTemplate.insert(requestMessage, "requestMessage");
         return requestMessage.getId().toHexString();
@@ -102,5 +175,19 @@ public class FriendService {
     public void mutualAddFriend(String requestUserId, String receiverUserId) {
         addFriend(requestUserId, receiverUserId);
         addFriend(receiverUserId, requestUserId);
+    }
+
+
+    public List<RequestMsg> getUntreatedFriendRequest(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("receiverId").is(userId).and("action").is(MsgTypeEnum.FRIEND_REQUEST).and("msgHandle").is(MsgHandleEnum.UNTREATED));
+
+        List<RequestMessage> requestMessages = mongoTemplate.find(query, RequestMessage.class);
+        List<RequestMsg> requestMsgs = new ArrayList<>();
+        requestMessages.forEach(requestMessage -> {
+            requestMsgs.add(msgService.packageRequestMsg(requestMessage));
+        });
+
+        return requestMsgs;
     }
 }

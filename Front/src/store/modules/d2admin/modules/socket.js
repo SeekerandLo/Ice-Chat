@@ -13,13 +13,13 @@ export default {
     KEEPALIVE_SOCKET: null
   },
   mutations: {
-    addContent(state, chatMsg) {
+    addContent (state, chatMsg) {
       state.CONTENTS.push(chatMsg)
     }
   },
   actions: {
     // 初始化
-    init({ state, dispatch }, { receiver, websocket }) {
+    init ({ state, dispatch }, { receiver, websocket }) {
       return new Promise(async resolve => {
         var userId = util.cookies.get('objectid')
         // 创建管理对象 将来在关闭的时候是通过这个来的
@@ -37,7 +37,7 @@ export default {
         resolve()
       })
     },
-    close({ state, dispatch }, { receiver }) {
+    close ({ state, dispatch }, { receiver }) {
       return new Promise(async resolve => {
         state.SOCKET_STORE.map((SOCKET, index) => {
           if (SOCKET.reveiverId === receiver.userId) {
@@ -48,10 +48,10 @@ export default {
         resolve()
       })
     },
-    chatAt({ state, dispatch, commit }, { chatMsg, receiver }) {
+    chatAt ({ state, dispatch, commit }, { chatMsg, receiver }) {
       commit('addContent', chatMsg)
     },
-    onMessage({ state, dispatch, commit }, { chatMsg, receiver }) {
+    onMessage ({ state, dispatch, commit }, { chatMsg, receiver }) {
       commit('addContent', chatMsg)
     }
   }

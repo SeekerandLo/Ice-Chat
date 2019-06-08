@@ -66,7 +66,7 @@ export default {
   computed: {
     // 混入 data 中
     ...mapState('d2admin/search', ['hotkey', 'pool', 'searchResult']),
-    ...mapState('d2admin/socket',['KEEPALIVE_SOCKET'])
+    ...mapState('d2admin/socket', ['KEEPALIVE_SOCKET'])
   },
   methods: {
     ...mapActions('d2admin/search', ['search', 'clearSearchResult']),

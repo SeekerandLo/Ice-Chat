@@ -1,5 +1,6 @@
 package com.liy.chat.netty.pojo;
 
+import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,4 +17,7 @@ public class RequestMsg extends ChatMsg implements Serializable {
     private String senderName;
 
     private String dateTime;
+
+    private MsgHandleEnum msgHandleEnum;
+
 }

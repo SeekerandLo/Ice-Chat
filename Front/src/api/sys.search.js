@@ -7,8 +7,8 @@ export function SearchFriend (data) {
     url: `/friend/search`,
     method: 'get',
     params: {
-      "searchText":searchText,
-      "me":me
+      'searchText': searchText,
+      'me': me
     }
   })
 }

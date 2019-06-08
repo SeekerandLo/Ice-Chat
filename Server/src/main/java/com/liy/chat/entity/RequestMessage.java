@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 /**
  * data: 2019/6/6 13:35
  **/
@@ -20,7 +22,9 @@ public class RequestMessage extends BaseEntity {
 
     private String receiverId;
 
-    private String reason;
+    private String msg;
 
     private MsgHandleEnum msgHandle;
+
+    private Date sendTime;
 }

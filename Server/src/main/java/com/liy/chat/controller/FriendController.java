@@ -1,6 +1,9 @@
 package com.liy.chat.controller;
 
+import com.liy.chat.entity.RequestMessage;
+import com.liy.chat.netty.pojo.RequestMsg;
 import com.liy.chat.service.FriendService;
+import com.liy.chat.vo.RequestResponseVO;
 import com.liy.chat.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,18 +39,21 @@ public class FriendController {
      * TODO　不能重复添加
      * TODO　用户不存在返回空
      */
-    @GetMapping("add")
-    public ResponseEntity<?> addFriend(@RequestParam String requestUserId, @RequestParam String receiveUserId) {
-
-
-        return null;
-
-
+    @GetMapping("/action")
+    public ResponseEntity<?> processRequest(@RequestParam String senderId, @RequestParam String receiverId, @RequestParam Integer action) {
+        RequestResponseVO responseVO = friendService.processRequest(senderId, receiverId, action);
+        return ResponseEntity.ok(responseVO);
     }
 
     @GetMapping("/list")
     public ResponseEntity<?> getFriends(@RequestParam String userId) {
         return ResponseEntity.ok(friendService.getFriends(userId));
+    }
+
+    @GetMapping("/untreated")
+    public ResponseEntity<?> getUntreatedRequest(@RequestParam String userId) {
+        List<RequestMsg> requestMessages = friendService.getUntreatedFriendRequest(userId);
+        return ResponseEntity.ok(requestMessages);
     }
 
 

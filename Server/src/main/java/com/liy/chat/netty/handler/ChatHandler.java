@@ -50,7 +50,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             //当 webSocket 第一次初始化channel时，把用户Id和它关联
             String senderId = chatMsg.getSenderId();
             String receiverId = chatMsg.getReceiverId();
-
             // 判断chatMsg的 receiverId 是否是 server
             if (chatMsg.getReceiverId().equals("server")) {
                 ChannelMap.put(ConnectionEnum.RECEIVE_REQUEST, senderId, receiverId, currentChannel);
@@ -62,13 +61,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             ApplicationContext applicationContext = SpringUtils.getApplicationContext();
             MsgService msgService = (MsgService) applicationContext.getBean("msgService");
             // TODO 要不要把记录存到以双方为主的数据库中
+            // 保存到聊天记录
             String msgId = msgService.saveMsgRecord(dataContent.getChatMsg());
             chatMsg.setMsgId(msgId);
-
             sendMsg(chatMsg, ConnectionEnum.CHAT);
         } else if (action.equals(MsgTypeEnum.FRIEND_REQUEST.type)) {
             ApplicationContext applicationContext = SpringUtils.getApplicationContext();
             FriendService friendService = (FriendService) applicationContext.getBean("friendService");
+            // 保存到请求记录
             String msgId = friendService.saveFriendRequest(dataContent.getChatMsg());
             chatMsg.setMsgId(msgId);
 
@@ -123,7 +123,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         Channel receiverChannel = null;
         if (connectionEnum.equals(ConnectionEnum.CHAT)) {
             receiverChannel = ChannelMap.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
-            // TODO 这里已经判断过是什么类型了，调用的方法再判断没有意义
             sendChatMsg(receiverChannel, chatMsg);
         } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
             receiverChannel = ChannelMap.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());

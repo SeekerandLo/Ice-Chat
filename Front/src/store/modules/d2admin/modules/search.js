@@ -62,9 +62,8 @@ export default {
       return new Promise((resolve, reject) => {
         var me = util.cookies.get('objectid')
 
-
         SearchFriend({
-          searchText,me
+          searchText, me
         }).then(async res => {
           // TODO 加到计算属性中去
           console.log('找到的朋友 ↓')

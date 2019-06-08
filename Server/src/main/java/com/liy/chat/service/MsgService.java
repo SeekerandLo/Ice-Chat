@@ -1,7 +1,9 @@
 package com.liy.chat.service;
 
 import com.liy.chat.entity.Message;
+import com.liy.chat.entity.RequestMessage;
 import com.liy.chat.netty.pojo.ChatMsg;
+import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
 import com.liy.chat.netty.pojo.RequestMsg;
 import com.liy.chat.utils.DateUtils;
 import org.apache.commons.beanutils.BeanUtils;
@@ -24,7 +26,7 @@ public class MsgService {
     @Autowired
     AccountService accountService;
 
-    // 保存聊天记录
+    // 保存聊天记录，单维护一个集合，以接收者和发送者为key保存记录的集合
     public String saveMsgRecord(ChatMsg chatMsg) {
         Message message = new Message();
         try {
@@ -42,7 +44,7 @@ public class MsgService {
     public RequestMsg packageRequestMsg(ChatMsg chatMsg) throws InvocationTargetException, IllegalAccessException {
         RequestMsg requestMsg = new RequestMsg();
         BeanUtils.copyProperties(requestMsg, chatMsg);
-
+        requestMsg.setMsgHandleEnum(MsgHandleEnum.UNTREATED);
         String username = accountService.getUsername(chatMsg.getSenderId());
         requestMsg.setSenderName(username);
         requestMsg.setDateTime(DateUtils.dateToString(new Date()));
@@ -50,5 +52,19 @@ public class MsgService {
         return requestMsg;
     }
 
+    public RequestMsg packageRequestMsg(RequestMessage requestMessage) {
+        RequestMsg requestMsg = new RequestMsg();
+        try {
+            BeanUtils.copyProperties(requestMsg, requestMessage);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        String username = accountService.getUsername(requestMessage.getSenderId());
+        requestMsg.setSenderName(username);
+        requestMsg.setDateTime(DateUtils.dateToString(requestMessage.getSendTime()));
+
+
+        return requestMsg;
+    }
 
 }

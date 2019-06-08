@@ -29,6 +29,7 @@ public class AccountController {
         UserVO userVO = null;
         try {
             userVO = accountService.loginService(accountDTO);
+            userVO.setToken("Ice-Chat");
         } catch (NoUserException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("不存在的用户");

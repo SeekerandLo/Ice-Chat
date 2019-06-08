@@ -1,6 +1,9 @@
 import dayjs from 'dayjs'
 import { get } from 'lodash'
 import util from '@/libs/util.js'
+import { Agree, Refuse, GetUntreatedRequest } from '@api/sys.friend'
+import { Message } from 'element-ui'
+
 
 export default {
   namespaced: true,
@@ -63,15 +66,54 @@ export default {
     },
     addFriendRequest({ state, commit }, { request }) {
       console.log(request)
-      commit("receiverRequest", request)
+      commit('receiverRequest', request)
     },
     // TODO 同意好友请求，发送请求，将请求改为已读
-    agree({ state, commit }, { }) {
+    agree({ state, commit }, { senderId, receiverId }) {
+      return new Promise((resolve, reject) => {
+        Agree({
+          senderId,
+          receiverId
+        }).then(async res => {
+          // TODO 加到计算属性中去
+          console.log(res)
+          // TODO　移除消息  
+          state.requests.map((item, index) => {
+            if (item.msgId === res.msgId) {
+              state.requests.splice(index, 1)
+
+            }
+          })
+
+          resolve()
+        }).catch(err => {
+          console.log('err: ', err)
+          reject(err)
+        })
+      })
 
     },
     // TODO 拒绝好友请求
-    refuse({ state, commit }, { }) {
+    refuse({ state, commit }, { senderId, receiverId }) {
 
+    },
+    getUntreatedRequest({ state, commit }) {
+      return new Promise((resolve, reject) => {
+        const userId = util.cookies.get('objectid')
+        console.log(userId)
+        GetUntreatedRequest({
+          userId
+        }).then((res) =>{
+          console.log(res)
+          state.requests = res
+
+
+        })
+        resolve()
+      }).catch(err => {
+        console.log('err: ', err)
+        reject(err)
+      })
     }
   },
   mutations: {
