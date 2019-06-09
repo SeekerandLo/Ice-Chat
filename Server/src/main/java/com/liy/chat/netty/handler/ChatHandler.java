@@ -96,20 +96,13 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         // 离开,当触发 移除时  会自动移除
-        System.out.println(ctx.channel());
-
+        ChannelMap.removeInvalidChannel(ctx.channel());
         clients.remove(ctx.channel());
         logger.info("关闭channel: " + ctx.channel().id().asLongText());
-
-
         ChannelMap.out();
         super.handlerRemoved(ctx);
     }
 
-    // TODO 当关闭连接时 移除 map中的
-    private void removeInvalidChannel() {
-
-    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

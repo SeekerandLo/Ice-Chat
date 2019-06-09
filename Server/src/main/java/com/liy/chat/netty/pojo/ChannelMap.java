@@ -19,6 +19,9 @@ public class ChannelMap {
 
     private static HashMap<String, Channel> channelMap = new HashMap<>();
 
+    // 存放channel 与 key的关系，移除的时候使用
+    private static HashMap<Channel, String> reversalChannelMap = new HashMap<>();
+
     // 封装key
     public static void put(ConnectionEnum type, String senderId, String receiverId, Channel channel) {
         String key = type + "-" + senderId + "-" + receiverId;
@@ -27,6 +30,7 @@ public class ChannelMap {
 
     private static void put(String key, Channel channel) {
         channelMap.put(key, channel);
+        reversalChannelMap.put(channel, key);
     }
 
     private static Channel get(String key) {
@@ -44,6 +48,12 @@ public class ChannelMap {
         for (Map.Entry<String, Channel> channelEntry : channelMap.entrySet()) {
             System.out.println(" channel Key: " + channelEntry.getKey() + " channel Value: " + channelEntry.getValue());
         }
+    }
+
+    public static void removeInvalidChannel(Channel channel) {
+        String key = reversalChannelMap.get(channel);
+        channelMap.remove(key);
+        reversalChannelMap.remove(channel);
     }
 
 }
