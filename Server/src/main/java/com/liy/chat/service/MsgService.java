@@ -42,7 +42,7 @@ public class MsgService {
     }
 
 
-    public FriendRequestVO packageFriendRequestVO(RequestMessage requestMessage) {
+    FriendRequestVO packageFriendRequestVO(RequestMessage requestMessage) {
         FriendRequestVO requestMsg = new FriendRequestVO();
         try {
             BeanUtils.copyProperties(requestMsg, requestMessage);

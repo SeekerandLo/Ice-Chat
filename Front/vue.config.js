@@ -13,7 +13,6 @@ process.env.VUE_APP_BUILD_TIME = require('dayjs')().format('YYYY-M-D HH:mm:ss')
 let publicPath = '/'
 // let publicPath = '/'
 
-
 module.exports = {
   publicPath, // 根据你的实际情况更改这里
   lintOnSave: true,
@@ -70,13 +69,6 @@ module.exports = {
             })
           ])
       })
-    // i18n
-    config.module
-      .rule('i18n')
-      .resourceQuery(/blockType=i18n/)
-      .use('i18n')
-      .loader('@kazupon/vue-i18n-loader')
-      .end()
     // svg
     const svgRule = config.module.rule('svg')
     svgRule.uses.clear()
@@ -100,17 +92,5 @@ module.exports = {
     // 重新设置 alias
     config.resolve.alias
       .set('@api', resolve('src/api'))
-  },
-  // devServer: {
-  //   proxy: {
-  //     '/api': {
-  //       target: 'http://101.132.147.55:8080/api',
-  //       ws: true,
-  //       changeOrigin: true,
-  //       pathRewrite: {
-  //         '^/api': ''
-  //       }
-  //     }
-  //   }
-  // }
+  }
 }

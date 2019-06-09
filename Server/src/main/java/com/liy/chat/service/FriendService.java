@@ -88,7 +88,6 @@ public class FriendService {
             // 拒绝
             String msgId = changeState(senderId, receiverId);
 
-
             RequestResponseVO responseVO = new RequestResponseVO();
             responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
             responseVO.setRequestActionEnum(RequestActionEnum.REFUSE);
@@ -99,7 +98,6 @@ public class FriendService {
         } else if (action.equals(RequestActionEnum.IGNORE.type)) {
             // 忽略
             String msgId = changeState(senderId, receiverId);
-
 
             RequestResponseVO responseVO = new RequestResponseVO();
             responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
@@ -121,9 +119,13 @@ public class FriendService {
 
         RequestMessage requestMessage = mongoTemplate.findOne(query, RequestMessage.class);
 
-        Update update = Update.update("msgHandle", MsgHandleEnum.PROCESSED);
-        mongoTemplate.findAndModify(query, update, RequestMessage.class);
-        return requestMessage.getId().toHexString();
+        if (requestMessage == null) {
+            return null;
+        } else {
+            Update update = Update.update("msgHandle", MsgHandleEnum.PROCESSED);
+            mongoTemplate.findAndModify(query, update, RequestMessage.class);
+            return requestMessage.getId().toHexString();
+        }
     }
 
 

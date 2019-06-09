@@ -1,11 +1,11 @@
 package com.liy.chat.controller;
 
 import com.liy.chat.dto.AccountDTO;
-import com.liy.chat.exception.RepeatUserException;
-import com.liy.chat.vo.UserVO;
 import com.liy.chat.exception.NoUserException;
 import com.liy.chat.exception.PasswordError;
+import com.liy.chat.exception.RepeatUserException;
 import com.liy.chat.service.AccountService;
+import com.liy.chat.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,7 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AccountDTO accountDTO) {
         UserVO userVO = null;
@@ -31,11 +32,9 @@ public class AccountController {
             userVO = accountService.loginService(accountDTO);
             userVO.setToken("Ice-Chat");
         } catch (NoUserException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("不存在的用户");
+            return ResponseEntity.status(550).body("不存在的用户");
         } catch (PasswordError e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("密码错误");
+            return ResponseEntity.status(551).body("密码错误");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,9 +47,8 @@ public class AccountController {
             accountService.register(accountDTO);
             return ResponseEntity.ok(accountDTO);
         } catch (RepeatUserException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (Exception e){
+            return ResponseEntity.status(552).body("重复的用户名");
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

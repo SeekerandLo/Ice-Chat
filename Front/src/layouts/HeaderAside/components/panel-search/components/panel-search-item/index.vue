@@ -48,35 +48,32 @@ export default {
       this.$prompt('输入验证信息', '添加好友', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
+      }).then(({ value }) => {
+        var chactMsg = this.chactMsg(
+          this.userId,
+          this.item.userId,
+          value,
+          null
+        )
+
+        var dataContent = this.dataContent(
+          this.CHAT_TYPE.FRIEND_REQUEST,
+          chactMsg,
+          null
+        )
+        // 未做任何处理的请求
+        this.keepAliveSocket.send(JSON.stringify(dataContent))
+
+        this.$message({
+          type: 'success',
+          message: '已发送'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
       })
-        .then(({ value }) => {
-          // 谁发的         发给谁            请求信息  null
-          var chactMsg = this.chactMsg(
-            this.userId,
-            this.item.userId,
-            value,
-            null
-          )
-
-          var dataContent = this.dataContent(
-            this.CHAT_TYPE.FRIEND_REQUEST,
-            chactMsg,
-            null
-          )
-
-          this.keepAliveSocket.send(JSON.stringify(dataContent))
-
-          this.$message({
-            type: 'success',
-            message: '已发送'
-          })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消输入'
-          })
-        })
     },
     // 封装消息体
     chactMsg (senderId, receiverId, msg, msgId) {

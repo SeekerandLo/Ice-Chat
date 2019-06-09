@@ -135,13 +135,6 @@ export default {
      */
     open ({ state, commit, dispatch }, { name, params, query, fullPath }) {
       return new Promise(async resolve => {
-        // console.log("在  page js open ")
-        // console.log(name)
-        // console.log(params)
-        // console.log(query)
-        // console.log(fullPath)
-        // console.log("_________________")
-
         // 已经打开的页面
         let opened = state.opened
         // 判断此页面是否已经打开 并且记录位置

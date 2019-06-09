@@ -9,6 +9,9 @@ function errorCreate (msg) {
   errorLog(error)
   throw error
 }
+// 创建一个警告
+
+// 警告提示
 
 // 记录和显示错误
 function errorLog (error) {
@@ -70,6 +73,9 @@ service.interceptors.response.use(
     const dataAxios = response.data
     // 这个状态码是和后端约定的
     const { status } = response
+
+    console.log(status)
+
     // 根据 code 进行判断
     if (status === undefined) {
       // 如果没有 code 代表这不是项目后端开发的接口 比如可能是 D2Admin 请求最新版本
@@ -106,6 +112,9 @@ service.interceptors.response.use(
         case 503: error.message = '服务不可用'; break
         case 504: error.message = '网关超时'; break
         case 505: error.message = 'HTTP版本不受支持'; break
+        case 550: error.message = '不存在的用户'; break
+        case 551: error.message = '密码错误'; break
+        case 552: error.message = '已存在的用户名'; break
         default: break
       }
     }

@@ -25,16 +25,13 @@ public class FriendController {
 
     @GetMapping("/search")
     public ResponseEntity<?> findTargetUser(@RequestParam String searchText, @RequestParam String me) {
-        System.out.println(searchText + "   " + me);
         List<UserVO> targetUsers = friendService.searchFriend(searchText, me);
         return ResponseEntity.ok(targetUsers);
     }
 
     /**
-     * TODO　添加好友　是能在线收到的，只要发送请求，就持久化，但是有状态位，标记是否处理
      * 没有处理的话就一直保留，每次页面初始化的时候会请求一次
      * TODO　不能重复添加
-     * TODO　用户不存在返回空
      */
     @GetMapping("/action")
     public ResponseEntity<?> processRequest(@RequestParam String senderId, @RequestParam String receiverId, @RequestParam Integer action) {

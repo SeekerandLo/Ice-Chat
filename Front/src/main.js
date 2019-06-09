@@ -3,10 +3,6 @@ import Vue from 'vue'
 import App from './App'
 // store
 import store from '@/store/index'
-// 模拟数据
-import '@/mock'
-// 多国语
-import i18n from './i18n'
 // 核心插件
 import d2Admin from '@/plugin/d2admin'
 
@@ -23,7 +19,6 @@ Vue.use(d2Admin)
 new Vue({
   router,
   store,
-  i18n,
   render: h => h(App),
   created () {
     // 处理路由 得到每一级的路由设置

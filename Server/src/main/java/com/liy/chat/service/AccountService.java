@@ -48,27 +48,21 @@ public class AccountService {
         User user = Optional.ofNullable(mongoTemplate.findOne(query, User.class)).orElseThrow(NoUserException::new);
         String password = user.getPassword();
 
-        if (password.equals(user.getPassword())) {
+        if (accountDTO.getPassword().equals(password)) {
             return packageUserVO(user);
         } else {
             throw new PasswordError();
         }
     }
 
-    public UserVO packageUserVO(User user) {
+    UserVO packageUserVO(User user) {
         UserVO userVO = new UserVO();
         userVO.setUsername(user.getUsername());
         userVO.setUserId(user.getId().toHexString());
         return userVO;
     }
 
-    public UserVO packageUserVO(AccountDTO accountDTO) {
-        UserVO userVO = new UserVO();
-        userVO.setUsername(accountDTO.getUsername());
-        return userVO;
-    }
-
-    public String getUsername(String objectId) {
+    String getUsername(String objectId) {
         User user = Optional.ofNullable(mongoTemplate.findById(new ObjectId(objectId), User.class)).orElseThrow(NoUserException::new);
         return user.getUsername();
     }
