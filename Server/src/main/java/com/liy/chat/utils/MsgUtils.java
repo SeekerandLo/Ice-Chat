@@ -9,8 +9,8 @@ import com.liy.chat.netty.pojo.DataContent;
 
 public class MsgUtils {
 
+    // 转换为传输结构
     public static DataContent toDataContent(String jsonString){
-        System.out.println(jsonString);
         return JSON.parseObject(jsonString,DataContent.class);
     }
 

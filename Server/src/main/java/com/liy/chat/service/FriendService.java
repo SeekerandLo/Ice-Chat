@@ -45,18 +45,23 @@ public class FriendService {
 
     public List<UserVO> searchFriend(String username, String me) {
         Query myQuery = new Query().addCriteria(Criteria.where("userId").is(me));
-        UserFriend currentUser = mongoTemplate.findOne(myQuery, UserFriend.class);
-        List<UserVO> friends = currentUser.getFriends();
-        // 把好友转换为map，但是不包含自己
-        Map<String, String> userFriendMap = friends.stream().collect(Collectors.toMap(UserVO::getUserId, UserVO::getUsername));
-        userFriendMap.put(me, null);
+        UserFriend currentUserFriend = mongoTemplate.findOne(myQuery, UserFriend.class);
+        List<UserVO> userVOS = new ArrayList<>();
 
         Query query = new Query();
         Pattern pattern = Pattern.compile("^.*" + username + ".*$", Pattern.CASE_INSENSITIVE);
-        query.addCriteria(Criteria.where("username").regex(pattern).and("_id").nin(userFriendMap.keySet()));
-        List<User> users = mongoTemplate.find(query, User.class);
 
-        List<UserVO> userVOS = new ArrayList<>();
+        if (currentUserFriend == null) {
+            query.addCriteria(Criteria.where("username").regex(pattern));
+        } else {
+            List<UserVO> friends = currentUserFriend.getFriends();
+            // 把好友转换为map，但是不包含自己
+            Map<String, String> userFriendMap = friends.stream().collect(Collectors.toMap(UserVO::getUserId, UserVO::getUsername));
+            userFriendMap.put(me, null);
+            query.addCriteria(Criteria.where("username").regex(pattern).and("_id").nin(userFriendMap.keySet()));
+        }
+
+        List<User> users = mongoTemplate.find(query, User.class);
         users.forEach(user -> {
             userVOS.add(accountService.packageUserVO(user));
         });
