@@ -7,9 +7,11 @@ export default {
     SOCKET_STORE: [
 
     ],
+    // 消息集合
     CONTENTS: [
 
     ],
+    // 保持连接
     KEEPALIVE_SOCKET: null
   },
   mutations: {
@@ -37,6 +39,7 @@ export default {
         resolve()
       })
     },
+    // 点击窗口的关闭按钮时提交的
     close ({ state, dispatch }, { receiver }) {
       return new Promise(async resolve => {
         state.SOCKET_STORE.map((SOCKET, index) => {
@@ -48,9 +51,11 @@ export default {
         resolve()
       })
     },
+    // 发送消息
     chatAt ({ state, dispatch, commit }, { chatMsg, receiver }) {
       commit('addContent', chatMsg)
     },
+    // 接收消息
     onMessage ({ state, dispatch, commit }, { chatMsg, receiver }) {
       commit('addContent', chatMsg)
     }
