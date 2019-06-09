@@ -14,7 +14,7 @@ import java.util.Map;
  * 聊天： Key: CHAT-5cf7e04eaeb1fc2018c78d21-5cf6871d12941a25508f4392
  **/
 
-public class ChannelMap {
+public class ChannelManager {
 
 
     private static HashMap<String, Channel> channelMap = new HashMap<>();

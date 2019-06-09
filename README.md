@@ -5,32 +5,26 @@
 &emsp;&emsp;为了完成网络作业写的小项目，前端以飞冰的 [D2Admin](https://github.com/d2-projects/d2-admin) 为基础，增加了聊天、好友请求、搜索好友功能，后端使用Spring Boot、Netty、MongoDB。
 
 
-### TODO
-- [] 
+## TODO
+- [ ] WebSocket 组件化
+- [ ] 再次登录聊天消息持久化
+- [ ] 离线消息保存
+- [ ] 消息签收 
 
-### 项目结构
-```
-|-Front
-|
-|-Server
-|
-|-Resource
-```
-
-### 安装
+## 安装
 - 前端
-    ```
-    # 安装依赖
-    npm install
+```
+# 安装依赖
+npm install
 
-    # 开发环境运行 localhost:8081
-    npm run dev
+# 开发环境运行 localhost:8081
+npm run dev
 
-    # 构建
-    npm run build
-    ```
+# 构建
+npm run build
+```
 - 后端  
-导入IDEA **File** -> **New** -> **Project from Existing Source...**，选择项目的 Server 文件夹，使用 [Gradle](https://gradle.org/) 管理依赖。进入后等待下载依赖，运行项目在 8080 端口
+导入IDEA。**File** -> **New** -> **Project from Existing Source...**，选择项目的 Server 文件夹，使用 [Gradle](https://gradle.org/) 管理依赖。进入后等待下载依赖，运行项目在 8080 端口
 
 ## 前端部分
 
@@ -42,7 +36,7 @@
     - 👉[Front/src/components/chat-window/index.vue]()  
     聊天的连接写在这里，每打开一个聊天窗口都会创建一个连接
 
-    - 👉[Front/src/layouts/HeaderAside/components/header-log/index.vue]()
+    - 👉[Front/src/layouts/HeaderAside/components/header-log/index.vue]()  
     接收请求的连接写在这里，当打开网页的时候创建，持续发送心跳请求，保持与服务器的连接
 
 - Vuex 管理
@@ -95,7 +89,7 @@
   
   UserFriend.java 存放用户的好友们  👉[entity](https://github.com/SeekerandLo/Ice-Chat/tree/develop/Server/src/main/java/com/liy/chat/entity)
 
-- ChannelMap.java 存放通信使用的 Channel，单对单聊天或群聊天都可以通过它来实现，设计了两种 `key` 对应前端的两种 WebSocket。例如：
+- ChannelManager.java 存放通信使用的 Channel，单对单聊天或群聊天都可以通过它来实现，设计了两种 `key` 对应前端的两种 WebSocket。例如：
   ```java
   // 下为一个Map的key和value
   
@@ -107,9 +101,25 @@
   ```
 - ChatMsg.java 消息实体，保存发送者、接收者、消息内容、消息id
 
-  dataContent.java  前后端通信数据体，标志该消息交给谁处理  👉[pojo](https://github.com/SeekerandLo/Ice-Chat/tree/develop/Server/src/main/java/com/liy/chat/netty/pojo)
+  DataContent.java  前后端通信数据体，标志该消息交给谁处理  👉[pojo](https://github.com/SeekerandLo/Ice-Chat/tree/develop/Server/src/main/java/com/liy/chat/netty/pojo)
 
 ### 消息转发
+
 - Netty 是通过重写控制器来实现通信，后端写了两个控制器控制，一个监听心跳，一个处理具体消息  
-  ChatHandler [消息类型判断及转发](https://github.com/SeekerandLo/Ice-Chat/blob/develop/Server/src/main/java/com/liy/chat/netty/handler/ChatHandler.java)   
-  HeartBeatHandler [心跳](https://github.com/SeekerandLo/Ice-Chat/blob/develop/Server/src/main/java/com/liy/chat/netty/handler/HeartBeatHandler.java)
+
+  消息类型判断及转发 👉[ChatHandler](https://github.com/SeekerandLo/Ice-Chat/blob/develop/Server/src/main/java/com/liy/chat/netty/handler/ChatHandler.java)   
+
+  心跳 👉[HeartBeatHandler](https://github.com/SeekerandLo/Ice-Chat/blob/develop/Server/src/main/java/com/liy/chat/netty/handler/HeartBeatHandler.java)
+
+### Channel 维护  
+- ChannelManager.java 中有两个 Map，一个以上述的具有标识意义的 `行为+用户Id` 作为 key，Channel 作为 value，另一个 Map 是它的反转，以 Channel 为 key，这个存在的意义是当用户在关闭 WebSocket 时通过获取该 Channel，继而获取上述的 `行为+用户Id key` ，然后在 Map 移除
+    ```java
+    public static void removeInvalidChannel(Channel channel) {
+        String key = reversalChannelMap.get(channel);
+        channelMap.remove(key);
+        reversalChannelMap.remove(channel);
+    }
+    ```
+
+- 当有用户发送创建 WebSocket 连接时，识别请求的类型，是建立连接请求还是发送消息请求，组装该用户的 key，将创建的 Channel 放入 channelMap 中。
+请求的类型在 👉[MsgTypeEnum](https://github.com/SeekerandLo/Ice-Chat/blob/master/Server/src/main/java/com/liy/chat/netty/pojo/MsgEnum/MsgTypeEnum.java)
