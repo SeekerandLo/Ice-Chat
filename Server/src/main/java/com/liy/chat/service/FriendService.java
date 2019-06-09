@@ -75,6 +75,9 @@ public class FriendService {
             // 同意->把请求状态改为已处理，且相互添加好友
             // TODO 考虑两个用户重复的发请求
             String msgId = changeState(senderId, receiverId);
+
+            // 取出用户userFriendId，如果不包含才加好友
+
             mutualAddFriend(senderId, receiverId);
 
             RequestResponseVO responseVO = new RequestResponseVO();

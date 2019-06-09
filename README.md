@@ -1,9 +1,3 @@
-## Chat
+## Ice-Chat 
 
-
-### 前端
-- username
-- userId
-
-- receiverId
-- senderId
+### README 加工中...
