@@ -62,6 +62,13 @@ export default {
     } else {
       this.initWebSocket()
     }
+    // TODO 发送请求获取之前的聊天记录，渲染到页面上
+    this.loadHistoryMsg(this.receiver)
+
+    
+
+
+
   },
   updated () {
     // 更新滚动跳
@@ -90,7 +97,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('d2admin/socket', ['init', 'chatAt', 'onMessage']),
+    ...mapActions('d2admin/socket', ['init', 'chatAt', 'onMessage','getHistoryMsg']),
     // websocket初始化
     initWebSocket () {
       const uri = process.env.VUE_APP_WEBSOCKETURI
@@ -179,6 +186,12 @@ export default {
       }
 
       return dataContent
+    },
+    // 获取聊天记录
+    loadHistoryMsg(){
+      this.getHistoryMsg({
+        receiver: this.receiver
+      })
     },
 
     // -----------处理上传的钩子

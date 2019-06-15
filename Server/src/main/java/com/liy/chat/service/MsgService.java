@@ -5,14 +5,21 @@ import com.liy.chat.entity.RequestMessage;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
 import com.liy.chat.utils.DateUtils;
+import com.liy.chat.utils.MsgUtils;
 import com.liy.chat.vo.FriendRequestVO;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * data: 2019/6/6 9:19
@@ -71,5 +78,29 @@ public class MsgService {
 
         return requestMsg;
     }
+
+    public List<ChatMsg> getHistoryMsg(String userId, String friendId) {
+        List<ChatMsg> chatMessages = new ArrayList<>();
+        Query msgQuery = new Query();
+
+        Criteria userReceiveCriteria = Criteria.where("senderId").is(friendId).and("receiverId").is(userId);
+        Criteria userSendCriteria = Criteria.where("senderId").is(userId).and("receiverId").is(friendId);
+        // 合并条件
+        Criteria arrangementCriteria = new Criteria().orOperator(userSendCriteria, userReceiveCriteria);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "sendTime");
+
+        msgQuery.addCriteria(arrangementCriteria).with(sort).limit(20);
+        List<Message> historyMessages = mongoTemplate.find(msgQuery, Message.class);
+
+        Collections.sort(historyMessages);
+
+        historyMessages.forEach(message -> {
+            chatMessages.add(MsgUtils.toChatMsg(message));
+        });
+
+        return chatMessages;
+    }
+
 
 }
