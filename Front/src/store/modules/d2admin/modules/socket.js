@@ -1,4 +1,5 @@
 import util from '@/libs/util.js'
+import { GetMsgHistory } from '@/api/sys.msg.js'
 
 export default {
   namespaced: true,
@@ -15,13 +16,13 @@ export default {
     KEEPALIVE_SOCKET: null
   },
   mutations: {
-    addContent (state, chatMsg) {
+    addContent(state, chatMsg) {
       state.CONTENTS.push(chatMsg)
     }
   },
   actions: {
     // 初始化
-    init ({ state, dispatch }, { receiver, websocket }) {
+    init({ state, dispatch }, { receiver, websocket }) {
       return new Promise(async resolve => {
         var userId = util.cookies.get('objectid')
         // 创建管理对象 将来在关闭的时候是通过这个来的
@@ -40,7 +41,7 @@ export default {
       })
     },
     // 点击窗口的关闭按钮时提交的
-    close ({ state, dispatch }, { receiver }) {
+    close({ state, dispatch }, { receiver }) {
       return new Promise(async resolve => {
         state.SOCKET_STORE.map((SOCKET, index) => {
           if (SOCKET.reveiverId === receiver.userId) {
@@ -52,12 +53,28 @@ export default {
       })
     },
     // 发送消息
-    chatAt ({ state, dispatch, commit }, { chatMsg, receiver }) {
+    chatAt({ state, dispatch, commit }, { chatMsg, receiver }) {
+      // TODO 能否将数据分用户存入
       commit('addContent', chatMsg)
     },
     // 接收消息
-    onMessage ({ state, dispatch, commit }, { chatMsg, receiver }) {
+    onMessage({ state, dispatch, commit }, { chatMsg, receiver }) {
+      // TODO 能否将数据分用户存入
       commit('addContent', chatMsg)
+    },
+    // 获取历史聊天记录
+    getHistoryMsg({ state, dispatch, commit }, { receiver }) {
+      return new Promise(async resolve => {
+        var userId = util.cookies.get('objectid')
+        var receiverId = receiver.userId
+        GetMsgHistory( userId, receiverId ).then(
+          (res) => {
+             res.map(msg => {
+               commit('addContent',msg)
+             })
+          })
+      })
+      resolve()
     }
   }
 }

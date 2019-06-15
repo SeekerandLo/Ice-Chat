@@ -1,7 +1,7 @@
 package com.liy.chat.netty.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.liy.chat.netty.pojo.ChannelMap;
+import com.liy.chat.netty.pojo.ChannelManager;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.DataContent;
 import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
@@ -50,11 +50,11 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             String receiverId = chatMsg.getReceiverId();
             // 判断chatMsg的 receiverId 是否是 server
             if (chatMsg.getReceiverId().equals("server")) {
-                ChannelMap.put(ConnectionEnum.RECEIVE_REQUEST, senderId, receiverId, currentChannel);
+                ChannelManager.put(ConnectionEnum.RECEIVE_REQUEST, senderId, receiverId, currentChannel);
             } else {
-                ChannelMap.put(ConnectionEnum.CHAT, senderId, receiverId, currentChannel);
+                ChannelManager.put(ConnectionEnum.CHAT, senderId, receiverId, currentChannel);
             }
-            ChannelMap.out();
+            ChannelManager.out();
         } else if (action.equals(MsgTypeEnum.CHAT.type)) {
             ApplicationContext applicationContext = SpringUtils.getApplicationContext();
             MsgService msgService = (MsgService) applicationContext.getBean("msgService");
@@ -96,10 +96,10 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         // 离开,当触发 移除时  会自动移除
-        ChannelMap.removeInvalidChannel(ctx.channel());
+        ChannelManager.removeInvalidChannel(ctx.channel());
         clients.remove(ctx.channel());
         logger.info("关闭channel: " + ctx.channel().id().asLongText());
-        ChannelMap.out();
+        ChannelManager.out();
         super.handlerRemoved(ctx);
     }
 
@@ -117,10 +117,10 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     private void sendMsg(ChatMsg chatMsg, ConnectionEnum connectionEnum) {
         Channel receiverChannel = null;
         if (connectionEnum.equals(ConnectionEnum.CHAT)) {
-            receiverChannel = ChannelMap.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
+            receiverChannel = ChannelManager.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
             sendChatMsg(receiverChannel, chatMsg);
         } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
-            receiverChannel = ChannelMap.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
+            receiverChannel = ChannelManager.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
             sendFriendRequestMsg(receiverChannel, chatMsg);
         }
 

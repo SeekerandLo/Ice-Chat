@@ -3,6 +3,7 @@ package com.liy.chat.netty.pojo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 聊天消息内容
@@ -19,4 +20,6 @@ public class ChatMsg implements Serializable {
     private String receiverId;
 
     private String msgId;
+
+    private Date sendTime;
 }
