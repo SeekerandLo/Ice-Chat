@@ -19,5 +19,9 @@ public enum RequestActionEnum {
         this.des = des;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
 
 }

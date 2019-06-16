@@ -68,7 +68,6 @@ export default {
     handleAgree (message) {
       var senderId = message.senderId
       var receiverId = message.receiverId
-      // console.log(message)
 
       this.agree({
         senderId,
