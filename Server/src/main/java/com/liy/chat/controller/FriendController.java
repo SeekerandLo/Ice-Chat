@@ -31,12 +31,15 @@ public class FriendController {
 
     /**
      * 没有处理的话就一直保留，每次页面初始化的时候会请求一次
-     * TODO　不能重复添加
      */
     @GetMapping("/action")
     public ResponseEntity<?> processRequest(@RequestParam String senderId, @RequestParam String receiverId, @RequestParam Integer action) {
-        RequestResponseVO responseVO = friendService.processRequest(senderId, receiverId, action);
+        RequestResponseVO responseVO = process(senderId, receiverId, action);
         return ResponseEntity.ok(responseVO);
+    }
+
+    private synchronized RequestResponseVO process(String senderId,String receiverId,Integer action){
+        return friendService.processRequest(senderId, receiverId, action);
     }
 
     @GetMapping("/list")

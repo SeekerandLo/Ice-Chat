@@ -7,9 +7,6 @@ import com.liy.chat.netty.pojo.DataContent;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.channels.Channel;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * data: 2019/6/5 19:18

@@ -69,50 +69,34 @@ public class FriendService {
         return userVOS;
     }
 
-
+    // TODO 重构
     public RequestResponseVO processRequest(String senderId, String receiverId, Integer action) {
-        if (action.equals(RequestActionEnum.AGREE.type)) {
-            // 同意->把请求状态改为已处理，且相互添加好友
-            // TODO 考虑两个用户重复的发请求
+        if (action.equals(RequestActionEnum.AGREE.getType())) {
             String msgId = changeState(senderId, receiverId);
-
             // 取出用户userFriendId，如果不包含才加好友
-
             mutualAddFriend(senderId, receiverId);
-
-            RequestResponseVO responseVO = new RequestResponseVO();
-            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
-            responseVO.setRequestActionEnum(RequestActionEnum.AGREE);
-            responseVO.setMsgId(msgId);
-
-            return responseVO;
-
+            return packageRequestResponseVO(RequestActionEnum.AGREE, msgId);
         } else if (action.equals(RequestActionEnum.REFUSE.type)) {
             // 拒绝
             String msgId = changeState(senderId, receiverId);
-
-            RequestResponseVO responseVO = new RequestResponseVO();
-            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
-            responseVO.setRequestActionEnum(RequestActionEnum.REFUSE);
-            responseVO.setMsgId(msgId);
-
-            return responseVO;
-
+            return packageRequestResponseVO(RequestActionEnum.REFUSE, msgId);
         } else if (action.equals(RequestActionEnum.IGNORE.type)) {
             // 忽略
             String msgId = changeState(senderId, receiverId);
-
-            RequestResponseVO responseVO = new RequestResponseVO();
-            responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
-            responseVO.setRequestActionEnum(RequestActionEnum.IGNORE);
-            responseVO.setMsgId(msgId);
-
-            return responseVO;
-
+            return packageRequestResponseVO(RequestActionEnum.IGNORE, msgId);
         }
         return null;
-
     }
+
+
+    private RequestResponseVO packageRequestResponseVO(RequestActionEnum action, String msgId) {
+        RequestResponseVO responseVO = new RequestResponseVO();
+        responseVO.setMsgHandleEnum(MsgHandleEnum.PROCESSED);
+        responseVO.setRequestActionEnum(action);
+        responseVO.setMsgId(msgId);
+        return responseVO;
+    }
+
 
     // 修改状态
     public String changeState(String senderId, String receiverId) {
