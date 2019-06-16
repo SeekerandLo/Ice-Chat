@@ -114,16 +114,15 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     }
 
 
+    // TODO 问题：如果出现多种聊天类型就需要加很多判断同时增加 send（...）Msg 方法
     private void sendMsg(ChatMsg chatMsg, ConnectionEnum connectionEnum) {
-        Channel receiverChannel = null;
         if (connectionEnum.equals(ConnectionEnum.CHAT)) {
-            receiverChannel = ChannelManager.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
+            Channel receiverChannel = ChannelManager.getChannel(ConnectionEnum.CHAT, chatMsg.getSenderId(), chatMsg.getReceiverId());
             sendChatMsg(receiverChannel, chatMsg);
         } else if (connectionEnum.equals(ConnectionEnum.RECEIVE_REQUEST)) {
-            receiverChannel = ChannelManager.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
+            Channel receiverChannel = ChannelManager.getChannel(ConnectionEnum.RECEIVE_REQUEST, "server", chatMsg.getReceiverId());
             sendFriendRequestMsg(receiverChannel, chatMsg);
         }
-
     }
 
 
