@@ -8,7 +8,8 @@ import java.util.Comparator;
 import java.util.Date;
 
 /**
- * data: 2019/6/4 17:47
+ * @author Liy
+ * @date 2019/6/4 17:47
  * TODO Message 可以和 chatMsg 合并的
  **/
 @EqualsAndHashCode(callSuper = true)

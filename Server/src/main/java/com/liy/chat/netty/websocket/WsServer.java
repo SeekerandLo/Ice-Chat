@@ -8,17 +8,17 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import sun.rmi.runtime.Log;
 
 /**
- * data: 2019/6/4 15:11
+ * @author Liy
+ * @date 2019/6/4 15:11
  **/
 @Component
-public class WSServer {
+public class WsServer {
 
     private Logger logger = LoggerFactory.getLogger(Logger.class);
 
-    private final static WSServer wsServer = new WSServer();
+    private final static WsServer WS_SERVER = new WsServer();
 
     private EventLoopGroup boss;
     private EventLoopGroup sub;
@@ -27,11 +27,11 @@ public class WSServer {
     private ChannelFuture future;
 
 
-    public WSServer(){
+    public WsServer(){
         boss = new NioEventLoopGroup();
         sub = new NioEventLoopGroup();
         serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(boss,sub).channel(NioServerSocketChannel.class).childHandler(new WSServerInitializer());
+        serverBootstrap.group(boss,sub).channel(NioServerSocketChannel.class).childHandler(new WsServerInitializer());
     }
 
     public void start(){
@@ -39,8 +39,8 @@ public class WSServer {
         logger.info("netty 启动成功");
     }
 
-    public static WSServer getWsServer(){
-        return wsServer;
+    public static WsServer getWsServer(){
+        return WS_SERVER;
     }
 
 }

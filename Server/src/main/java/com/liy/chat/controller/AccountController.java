@@ -2,7 +2,7 @@ package com.liy.chat.controller;
 
 import com.liy.chat.dto.AccountDTO;
 import com.liy.chat.exception.NoUserException;
-import com.liy.chat.exception.PasswordError;
+import com.liy.chat.exception.PasswordErrorException;
 import com.liy.chat.exception.RepeatUserException;
 import com.liy.chat.service.AccountService;
 import com.liy.chat.vo.UserVO;
@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * data: 2019/6/4 19:50
+ * @author Liy
+ * @date 2019/6/4 19:50
  **/
 @RequestMapping("/api/account")
 @Controller
@@ -33,7 +34,7 @@ public class AccountController {
             userVO.setToken("Ice-Chat");
         } catch (NoUserException e) {
             return ResponseEntity.status(550).body("不存在的用户");
-        } catch (PasswordError e) {
+        } catch (PasswordErrorException e) {
             return ResponseEntity.status(551).body("密码错误");
         } catch (Exception e) {
             e.printStackTrace();

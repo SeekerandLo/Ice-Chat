@@ -7,7 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 /**
- * data: 2019/6/4 17:46
+ * @author Liy
+ * @date 2019/6/4 17:46
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data

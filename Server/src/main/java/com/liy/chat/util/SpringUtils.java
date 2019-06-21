@@ -1,4 +1,4 @@
-package com.liy.chat.utils;
+package com.liy.chat.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -6,7 +6,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * data: 2019/6/6 9:16
+ * @author liy
+ * @date 2019/6/6 9:16
  **/
 @Component
 public class SpringUtils implements ApplicationContextAware {

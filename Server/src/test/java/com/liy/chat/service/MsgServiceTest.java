@@ -22,12 +22,11 @@ public class MsgServiceTest {
         chatMsg.setReceiverId("dasdsasa");
         chatMsg.setSenderId("eqweqwqw");
         msgService.saveMsgRecord(chatMsg);
-
     }
 
     @Test
     public void getHistoryMsg(){
         msgService.getHistoryMsg("5cf6871d12941a25508f4392","5cf7b7971cc0e41488e5cbbd");
-
     }
+
 }

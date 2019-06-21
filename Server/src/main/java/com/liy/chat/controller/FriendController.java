@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
- * data: 2019/6/5 10:31
+ * @author Liy
+ * @date 2019/6/5 10:31
  **/
 @Controller
 @RequestMapping("/api/friend")

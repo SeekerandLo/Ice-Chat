@@ -4,9 +4,9 @@ import com.liy.chat.entity.RequestMessage;
 import com.liy.chat.entity.User;
 import com.liy.chat.entity.UserFriend;
 import com.liy.chat.netty.pojo.ChatMsg;
-import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
-import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
-import com.liy.chat.netty.pojo.MsgEnum.RequestActionEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgHandleEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgTypeEnum;
+import com.liy.chat.netty.pojo.msgenum.RequestActionEnum;
 import com.liy.chat.vo.FriendRequestVO;
 import com.liy.chat.vo.RequestResponseVO;
 import com.liy.chat.vo.UserVO;
@@ -27,7 +27,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * data: 2019/6/5 10:28
+ * @author Liy
+ * @date 2019/6/5 10:28
  **/
 @Service
 public class FriendService {
@@ -46,7 +47,7 @@ public class FriendService {
     public List<UserVO> searchFriend(String username, String me) {
         Query myQuery = new Query().addCriteria(Criteria.where("userId").is(me));
         UserFriend currentUserFriend = mongoTemplate.findOne(myQuery, UserFriend.class);
-        List<UserVO> userVOS = new ArrayList<>();
+        List<UserVO> userVos = new ArrayList<>();
 
         Query query = new Query();
         Pattern pattern = Pattern.compile("^.*" + username + ".*$", Pattern.CASE_INSENSITIVE);
@@ -63,10 +64,10 @@ public class FriendService {
 
         List<User> users = mongoTemplate.find(query, User.class);
         users.forEach(user -> {
-            userVOS.add(accountService.packageUserVO(user));
+            userVos.add(accountService.packageUserVO(user));
         });
 
-        return userVOS;
+        return userVos;
     }
 
     // TODO 重构
@@ -154,12 +155,12 @@ public class FriendService {
             // 创建一个
             UserFriend newUserFriend = new UserFriend();
             newUserFriend.setUserId(requestUserId);
-            List<UserVO> userVOS = new ArrayList<>();
+            List<UserVO> userVos = new ArrayList<>();
             // TODO 判断是否存在 应该在查找的时候判断
             User receiver = mongoTemplate.findById(new ObjectId(receiverUserId), User.class);
             UserVO receiverVo = accountService.packageUserVO(receiver);
-            userVOS.add(receiverVo);
-            newUserFriend.setFriends(userVOS);
+            userVos.add(receiverVo);
+            newUserFriend.setFriends(userVos);
 
             mongoTemplate.insert(newUserFriend, "userFriend");
         } else {

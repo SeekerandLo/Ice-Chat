@@ -1,7 +1,8 @@
 package com.liy.chat.exception;
 
 /**
- * data: 2019/6/5 23:06
+ * @author Liy
+ * @date 2019/6/5 23:06
  **/
 
 public class RepeatUserException extends RuntimeException{

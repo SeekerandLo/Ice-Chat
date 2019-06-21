@@ -5,7 +5,7 @@ import com.liy.chat.exception.RepeatUserException;
 import com.liy.chat.vo.UserVO;
 import com.liy.chat.entity.User;
 import com.liy.chat.exception.NoUserException;
-import com.liy.chat.exception.PasswordError;
+import com.liy.chat.exception.PasswordErrorException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * data: 2019/6/4 20:52
+ * @author Liy
+ * @date 2019/6/4 20:52
  **/
 @Service
 public class AccountService {
@@ -51,7 +52,7 @@ public class AccountService {
         if (accountDTO.getPassword().equals(password)) {
             return packageUserVO(user);
         } else {
-            throw new PasswordError();
+            throw new PasswordErrorException();
         }
     }
 

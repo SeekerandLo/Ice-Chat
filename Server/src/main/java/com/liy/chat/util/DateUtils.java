@@ -1,11 +1,11 @@
-package com.liy.chat.utils;
+package com.liy.chat.util;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * data: 2019/6/7 21:32
+ * @author Liy
+ * @date 2019/6/7 21:32
  **/
 
 public class DateUtils {

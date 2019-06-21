@@ -7,7 +7,8 @@ import java.util.Date;
 
 /**
  * 聊天消息内容
- * data: 2019/6/5 15:45
+ * @author Liy
+ * @date 2019/6/5 15:45
  **/
 @Data
 public class ChatMsg implements Serializable {

@@ -5,7 +5,8 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * data: 2019/6/4 17:37
+ * @author Liy
+ * @date 2019/6/4 17:37
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data

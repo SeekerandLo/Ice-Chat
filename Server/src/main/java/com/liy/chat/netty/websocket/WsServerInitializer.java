@@ -12,10 +12,11 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 /**
- * data: 2019/6/4 15:15
+ * @author Liy
+ * @date 2019/6/4 15:15
  **/
 
-public class WSServerInitializer extends ChannelInitializer<SocketChannel> {
+public class WsServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline channelPipeline = ch.pipeline();

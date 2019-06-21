@@ -1,7 +1,7 @@
 package com.liy.chat.entity;
 
-import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
-import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgHandleEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 /**
- * data: 2019/6/6 13:35
+ * @author Liy
+ * @date 2019/6/6 13:35
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data

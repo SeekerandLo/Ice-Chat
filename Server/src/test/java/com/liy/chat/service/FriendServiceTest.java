@@ -1,15 +1,11 @@
 package com.liy.chat.service;
 
-import com.liy.chat.netty.pojo.MsgEnum.RequestActionEnum;
+import com.liy.chat.netty.pojo.msgenum.RequestActionEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.swing.*;
-
-import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

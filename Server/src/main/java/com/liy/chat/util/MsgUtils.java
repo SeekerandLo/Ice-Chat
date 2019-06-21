@@ -1,15 +1,14 @@
-package com.liy.chat.utils;
+package com.liy.chat.util;
 
 import com.alibaba.fastjson.JSON;
 import com.liy.chat.entity.Message;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.DataContent;
-import org.apache.commons.beanutils.BeanUtils;
-
-import java.lang.reflect.InvocationTargetException;
+import org.springframework.beans.BeanUtils;
 
 /**
- * data: 2019/6/5 19:18
+ * @author Liy
+ * @date 2019/6/5 19:18
  **/
 
 public class MsgUtils {
@@ -21,11 +20,9 @@ public class MsgUtils {
 
     public static ChatMsg toChatMsg(Message message) {
         ChatMsg chatMsg = new ChatMsg();
-        try {
-            BeanUtils.copyProperties(chatMsg, message);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+
+        BeanUtils.copyProperties(message, chatMsg);
+
         return chatMsg;
     }
 

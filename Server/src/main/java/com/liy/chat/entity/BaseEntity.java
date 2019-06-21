@@ -7,7 +7,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * data: 2019/6/4 17:39
+ * @author Liy
+ * @date 2019/6/4 17:39
  **/
 @Data
 @Document

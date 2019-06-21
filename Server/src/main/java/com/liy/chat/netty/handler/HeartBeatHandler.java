@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 心跳的handler
- * data: 2019/6/4 15:28
+ * @author Liy
+ * @date 2019/6/4 15:28
  **/
 public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 

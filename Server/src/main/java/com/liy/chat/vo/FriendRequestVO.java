@@ -1,7 +1,7 @@
 package com.liy.chat.vo;
 
 import com.liy.chat.netty.pojo.ChatMsg;
-import com.liy.chat.netty.pojo.MsgEnum.MsgHandleEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgHandleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,7 +10,8 @@ import java.io.Serializable;
 /**
  * 展示好友请求
  * TODO 将RequestMsg分清楚
- * data: 2019/6/8 15:42
+ * @author Liy
+ * @date 2019/6/8 15:42
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data

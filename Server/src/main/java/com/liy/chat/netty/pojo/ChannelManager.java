@@ -1,13 +1,14 @@
 package com.liy.chat.netty.pojo;
 
-import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
+import com.liy.chat.netty.pojo.msgenum.ConnectionEnum;
 import io.netty.channel.Channel;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * data: 2019/6/5 17:24
+ * @author Liy
+ * @date 2019/6/5 17:24
  * 存放Channel与用户Id的关系
  * 目前有两类
  * 接收请求：Key: RECEIVE_REQUEST-5cf7e04eaeb1fc2018c78d21-server

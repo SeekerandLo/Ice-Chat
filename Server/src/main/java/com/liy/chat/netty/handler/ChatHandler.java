@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.liy.chat.netty.pojo.ChannelManager;
 import com.liy.chat.netty.pojo.ChatMsg;
 import com.liy.chat.netty.pojo.DataContent;
-import com.liy.chat.netty.pojo.MsgEnum.ConnectionEnum;
-import com.liy.chat.netty.pojo.MsgEnum.MsgTypeEnum;
+import com.liy.chat.netty.pojo.msgenum.ConnectionEnum;
+import com.liy.chat.netty.pojo.msgenum.MsgTypeEnum;
 import com.liy.chat.service.FriendService;
 import com.liy.chat.service.MsgService;
-import com.liy.chat.utils.MsgUtils;
-import com.liy.chat.utils.SpringUtils;
+import com.liy.chat.util.MsgUtils;
+import com.liy.chat.util.SpringUtils;
 import com.liy.chat.vo.FriendRequestVO;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,7 +24,8 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * 处理消息的handler
- * data: 2019/6/4 15:28
+ * @author Liy
+ * @date 2019/6/4 15:28
  **/
 public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
@@ -49,7 +50,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             String senderId = chatMsg.getSenderId();
             String receiverId = chatMsg.getReceiverId();
             // 判断chatMsg的 receiverId 是否是 server
-            if (chatMsg.getReceiverId().equals("server")) {
+            if ("server".equals(chatMsg.getReceiverId())) {
                 ChannelManager.put(ConnectionEnum.RECEIVE_REQUEST, senderId, receiverId, currentChannel);
             } else {
                 ChannelManager.put(ConnectionEnum.CHAT, senderId, receiverId, currentChannel);
