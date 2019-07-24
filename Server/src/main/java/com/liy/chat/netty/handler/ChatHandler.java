@@ -39,7 +39,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         String content = msg.text();
         Channel currentChannel = ctx.channel();
-
         // 封装数据 TODO 判断
         DataContent dataContent = MsgUtils.toDataContent(content);
         Integer action = dataContent.getAction();
@@ -70,20 +69,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
             // 保存到请求记录
             String msgId = friendService.saveFriendRequest(dataContent.getChatMsg());
             chatMsg.setMsgId(msgId);
-
             // 首先保存到 数据库中，谁请求的 ，谁接收到的，然后通过 netty 转发，如果在线，通过接收请求的的 channel 发送给目标用户
             sendMsg(chatMsg, ConnectionEnum.RECEIVE_REQUEST);
-
         } else if (action.equals(MsgTypeEnum.SIGNED.type)) {
             // 签收消息
         } else if (action.equals(MsgTypeEnum.KEEPALIVE.type)) {
             // 保持连接
             logger.info("Bon Bon：" + ctx.channel().id().asShortText());
-
-
         }
-
-
     }
 
     @Override
@@ -130,14 +123,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     // 发送聊天消息
     private void sendChatMsg(Channel receiverChannel, ChatMsg chatMsg) {
         if (receiverChannel == null) {
-            // 用户离线，保存，
+            // TODO 用户离线，保存，
         } else {
             Channel findChannel = clients.find(receiverChannel.id());
             if (findChannel != null) {
                 // 用户在线,发送消息
                 receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(chatMsg)));
             } else {
-                // 用户离线，保存
+                // TODO 用户离线，保存
             }
         }
     }
@@ -149,16 +142,15 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
         FriendRequestVO friendRequestVO = msgService.packageFriendRequestVO(chatMsg);
         if (receiverChannel == null) {
-            // 用户离线，保存，
+            // TODO 用户离线，保存，
         } else {
             Channel findChannel = clients.find(receiverChannel.id());
             if (findChannel != null) {
                 // 用户在线,发送消息
                 receiverChannel.writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(friendRequestVO)));
             } else {
-                // 用户离线，保存
+                // TODO 用户离线，保存
             }
         }
-
     }
 }

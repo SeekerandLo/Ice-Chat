@@ -28,6 +28,5 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
                 logger.info("当前Channel数量为：" + ChatHandler.clients.size());
             }
         }
-
     }
 }
